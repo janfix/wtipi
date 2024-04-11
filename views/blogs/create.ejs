@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../partials/head.ejs') %>
+
+  <body>
+    <%- include('../partials/nav.ejs') %>
+
+      <div class="create-blog content">
+        <form action="/blogs">
+          <div id="user-data" data-id="<%= user.id %>" data-email="<%= user.email %>">
+            Your test will be saved based on your ID that associated with your
+            email <%= user.email %>, so that other users cannot delete it.
+          </div>
+          <label for="title">Test title:</label>
+          <input type="text" id="title" name="title" required />
+          <label for="snippet">Test snippet:</label>
+          <input type="text" id="snippet" name="snippet" required />
+          <label for="body">Test presentation:</label>
+          <textarea id="body" name="body"
+            required>Test presentation: &#13;&#10;Test type: &#13;&#10;Scoring rules:  &#13;&#10;Duration: &#13;&#10;Getting the results :  </textarea>
+          <label for="testurl">Test URL (copy this url to access to the test) : </label>
+          <input type="text" id="testurl" name="testurl" value="https://wiquid.fr/14142536" />
+          <button type="submit">Submit</button>
+        </form>
+      </div>
+
+      <script>
+        const form = document.querySelector("form");
+        const blogError = document.querySelector(".blog.error");
+
+        form.addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          // get the values
+          const title = form.title.value;
+          const snippet = form.snippet.value;
+          const body = form.body.value;
+
+          const userElement = document.getElementById("user-data");
+          const userData = {
+            id: userElement.getAttribute("data-id"),
+            email: userElement.getAttribute("data-email"),
+          };
+
+          const creator = userData.id;
+          console.log("user: ", userData.email);
+
+          const blogData = {
+            title,
+            creator,
+            snippet,
+            body,
+          };
+          try {
+            const res = await fetch("/blogs", {
+              method: "POST",
+              body: JSON.stringify(blogData),
+              headers: { "content-Type": "application/json" },
+            }).then((result) => {
+              if (result) {
+                location.assign("/");
+              }
+            });
+          } catch (error) {
+            console.log(error);
+          }
+        });
+
+        function generateUniqueCode() {
+          const array = new Uint8Array(4);
+          window.crypto.getRandomValues(array);
+          return Array.from(array, byte => byte.toString(4).padStart(2, '0')).join('');
+        }
+
+        // Appel de la fonction et affichage du code unique dans la console
+        const uniqueCode = generateUniqueCode();
+        console.log(uniqueCode);
+
+      </script>
+
+      <%- include('../partials/footer.ejs') %>
+  </body>
+
+</html>

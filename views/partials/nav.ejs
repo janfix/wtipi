@@ -1,0 +1,20 @@
+<nav>
+  <div class="site-title">
+    <a href="/"><h1>WTP<img class="logotipi" src="../tipis.png"/></h1></a>
+    <p>WTest-Platform</p>
+  </div>
+  <ul>
+    <% if(user){ %>
+    <li>Welcome, <%= user.email %> - <%= user.role %></li>
+    <li><a href="/">Tests</a></li>
+    <li><a href="/about">About</a></li>
+    <li><a href="/blogs/create">New Test</a></li>
+    <li><a href="/logout">Log out</a></li>
+    <% }else{ %>
+    <li><a href="/">Test</a></li>
+    <li><a href="/about">About</a></li>
+    <li><a href="/login">Log in</a></li>
+    <li><a href="/register" class="btn">Register</a></li>
+    <% } %>
+  </ul>
+</nav>

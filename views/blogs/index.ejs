@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <%- include('../partials/head.ejs') %>
+  <body>
+    <%- include('../partials/nav.ejs') %>
+
+    <div class="blogs content">
+      <div class="info">
+       Your current assessments are diplayed here.
+      </div>
+      <h2>Current assessments</h2>
+      <% if(blogs.length > 0){ %> <% blogs.forEach(blog => { %>
+      <a class="single" href="/blogs/<%= blog._id %>">
+        <h3 class="title"><%= blog.title %></h3>
+        <p class="snippet"><%= blog.snippet %></p>
+      </a>
+      <% }) %> <% } else { %>
+      <p>No Blogs to display yet!</p>
+      <% } %>
+    
+      <h2>Completed assessments</h2>
+      <p>Here the completed assessments</p>
+    
+    </div>
+
+    <%- include('../partials/footer.ejs') %>
+  </body>
+</html>

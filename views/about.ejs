@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+  <%- include('./partials/head.ejs') %>
+  <body>
+    <%- include('./partials/nav.ejs') %>
+
+    <div class="about content">
+      <h2>About WTest-Platform or WTP</h2>
+      <div>
+        <p>WTP is a new kind of assessment platform.</p>
+        <br>
+      </div>
+    </div>
+
+     <div hidden class="about content">
+      <h2>Technical notes</h2>
+      <div>
+        <p>
+          <b>WTest-Platform</b> is a simple assessment platform, consisting of a "<B>Blogs</B>"
+          page to display all tests for each student, an "<b>About</b>" page, and "<b>New Blog</b
+          >" page to add new posts if the user is logged in. I created a simple
+          sign up and sign in pages, and for authentication I used
+          <b>JWT</b> (JSON Web Tokens). The logged in user can delete there own
+          blogs individually.<br /><br />
+          I used <b>Node.js</b> with
+          <b>Express</b>
+          framework to mange routing, requests, server-side logic and
+          responses.<br />
+          <i>
+            You can find more information about <b>Express</b>
+            <a style="color: blue" href="https://expressjs.com" target="_blank"
+              >here</a
+            >. </i
+          ><br />
+        </p>
+        <p>
+          To output the dynamic data that come from database I used a view
+          engine
+          <b> EJS </b>
+        </p>
+      </div>
+      <br />
+      <div>
+        <h4>EJS :</h4>
+        <i style="color: grey"> Embedded JavaScript templating</i><br />
+        <b> - How dose EJS work? </b><br />
+        The view files live on the server and we want to render one through the
+        browser that view file is passed into the EJS view engine to be
+        processed, the engine looks for any kind of dynamic content, variables,
+        loops... etc.<br />
+        Then whenever it finds those it figures out the resulting HTML code for
+        those parts and in the end it spits out a valid HTML page based on the
+        template we wrote and then the HTML page with the resulting data inside
+        it will be returned to the browser, and this whole process is called
+        <b> server-side </b>rendering.<br />
+        <i>
+          You can find more information about
+          <b> EJS </b>
+          <a style="color: blue" href="https://ejs.co">here</a>.
+        </i>
+      </div>
+      <br />
+      <div>
+        <h4>Database :</h4>
+        I used <b>MongoDB</b> to handle data, with <b>Mongoose</b> I created a
+        Schema for the blogs, it's simple, consisting of:<br />
+        title, snippet and body, with a JSON object timestamps
+        <i>-generated and saved automatically in the database-</i> to sort blogs
+        by creation date.
+      </div>
+      <br />
+      <div>
+        <h4>MVC :</h4>
+        approach It stands for <b>Model</b>, <b>View</b>, <b>Controller</b>.
+        It's a method of structuring the code and files to make the code more
+        modular, reusable and easier to maintain.<br /><br />
+        <b>Models</b> are how to describe the data structure and use them to
+        interact with the database.<br />
+        <b>Views</b> are how to make HTML templates that the a user will see.<br />
+        <b>Controllers</b> is the thing that forms the link between models and
+        views, it use models to get data and then pass that data into a view.<br />
+        The idea behinde this approach is to make the code easier to manage and
+        to undestand, so I splitted the code into different areas of files and
+        then each area of file has its own job to do, so the route file matches
+        incoming requests and it passes those requests to the correct controller
+        function. A controller communicates with the appropriate model to get
+        dtat into a view, then the view renders that data into it's template and
+        it get sent to the browser.
+      </div>
+      <br />
+      <br />
+      <div>
+        <h4>Authentication and validation :</h4>
+        for user registration, login and proper data entry verification process
+        I used:<br /><br />
+        <b>- JWT</b><br />
+        <i>JSON Web Token</i> is an open standard (RFC 7519) that defines a
+        compact and self-contained way for securely transmitting information
+        between parties as a JSON object. This information can be verified and
+        trusted because it is digitally signed. JWTs can be signed using a
+        secret (with the HMAC algorithm) or a public/private key pair using RSA
+        or ECDSA.<br />
+        <i>
+          You can find more information about
+          <b> JWT </b>
+          <a style="color: blue" href="https://jwt.io/">here</a>. </i
+        ><br /><br />
+        <b>- Validator:</b><br />
+        It is a third-party validation package, this package has different
+        functions inside it that we can use to validate differnt things and one
+        of those things is to validate an E-mail. I used "<i>isEmail</i> "
+        instead of creating my own function to validate the E-mail.<br />
+        <i>
+          You can find more information about
+          <b> Validator </b>
+          <a style="color: blue" href="https://www.npmjs.com/package/validator"
+            >here</a
+          >.
+        </i>
+      </div>
+      <br />
+      <br />
+      <div>
+        <h4>Installation :</h4>
+        <br />
+        <ul>
+          <li>
+            Go to the project repository on <b>Github</b> from
+            <a
+              style="color: blue"
+              href="https://github.com/alanmiste/My-Blog"
+              target="_blank"
+              >here</a
+            >.
+          </li>
+          <li>Clone the project or download it.</li>
+          <li>Run <b>npm install</b> in project folder.</li>
+          <li>
+            The app needs to connect to <b>mongodb</b> database via
+            <b>MongoDB URI</b> in the <b>.env</b> file.
+          </li>
+          <li>Create a database named <b>AMBlog</b> if needed.</li>
+          <li>Run the project with <b>node app.js</b>.</li>
+          <li>
+            The App will run on
+            <a style="color: blue" href="http://localhost:3000" target="_blank"
+              >http://localhost:3000</a
+            >
+            in the browser.
+          </li>
+        </ul>
+
+        <%- include('./partials/footer.ejs') %>
+      </div>
+    </div>
+  </body>
+</html>
