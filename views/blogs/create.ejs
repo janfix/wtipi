@@ -6,7 +6,7 @@
     <%- include('../partials/nav.ejs') %>
 
       <div class="create-blog content">
-        <form action="/blogs">
+        <form action="/upload" enctype="multipart/form-data">
           <div id="user-data" data-id="<%= user.id %>" data-email="<%= user.email %>">
             Your test will be saved based on your ID that associated with your
             email <%= user.email %>, so that other users cannot delete it.
@@ -20,6 +20,8 @@
             required>Test presentation: &#13;&#10;Test type: &#13;&#10;Scoring rules:  &#13;&#10;Duration: &#13;&#10;Getting the results :  </textarea>
           <label for="testurl">Test URL (copy this url to access to the test) : </label>
           <input type="text" id="testurl" name="testurl" value="https://wiquid.fr/14142536" />
+          <label for="file">Upload File:</label>
+          <input type="file" id="file" name="file" required />
           <button type="submit">Submit</button>
         </form>
       </div>
@@ -31,10 +33,20 @@
         form.addEventListener("submit", async (e) => {
           e.preventDefault();
 
-          // get the values
+          console.log(form)
+          const formData = new FormData(form);
+          console.log(formData.get('file'))
+          const fileData = new FormData(); // Création d'un FormData spécifique pour le fichier
+          // Extrayez uniquement le fichier et préparez un FormData dédié
+          fileData.append('file', formData.get('file'));
+
+          // get the text-form values
           const title = form.title.value;
           const snippet = form.snippet.value;
           const body = form.body.value;
+
+          // get the path 
+          const fpath = form.file.value;
 
           const userElement = document.getElementById("user-data");
           const userData = {
@@ -51,6 +63,25 @@
             snippet,
             body,
           };
+
+
+          try {
+            // Envoi du fichier
+            const fileResponse = await fetch('/upload', {
+              method: 'POST',
+              body: fileData,
+            });
+            console.log(fileResponse)
+            if (fileResponse.ok) {
+              console.log("Upload du fichier réussi");
+            } else {
+              console.error("Échec de l'upload du fichier");
+            }
+          } catch (error) {
+            console.error("Erreur lors de l'envoi du fichier :", error);
+          }
+
+
           try {
             const res = await fetch("/blogs", {
               method: "POST",
