@@ -5,24 +5,26 @@
     <%- include("../partials/nav.ejs") %>
 
     <div class="details content">
-      <h2><%= blog.title %></h2>
+      <h2><%= group.title %></h2>
       
       
       <div class="content">
-        <% if(user){ %> <p>Informations provenant du manifest.json</p> <%}%>
-        <% if(user){ %> <p>Informations provenant du monitoring</p> <%}%>
-        <p><%= blog.body %></p>
+        <p><%= group.groupName %></p>
+        <p><%= group.description %></p>
+        <p><%= group.createdAt %></p>
+        
+        <p><%= group.body %></p>
       </div>
 
       <!-- Tool Bar -->
-      <% if(user){ %> <% if(user._id == blog.creator){ %>
-      <a class="delete actionBT" data-doc="<%= blog._id %>">
+      <% if(user){ %> <% if(user._id == group.creator){ %>
+      <a class="delete actionBT" data-doc="<%= group._id %>">
         <img src="/trashcan.svg" title="Remove Assessment" alt="Delete icon" />
       </a>
-      <a class="edit actionBT" data-doc="<%= blog._id %>">
+      <a class="edit actionBT" data-doc="<%= group._id %>">
         <img width="25px" src="/btEdit.png" title="Edit test information" alt="Edit Test info" />
       </a>
-      <a class="start actionBT" data-doc="<%= blog._id %>">
+      <a class="start actionBT" data-doc="<%= group._id %>">
         <img width="25px" src="/btStart.png" title="Start test" alt="Start Test" />
       </a>
       <% }else{%><div class="delete">Impossible</div> 
@@ -36,7 +38,7 @@
       const trashcan = document.querySelector("a.delete");
 
       trashcan.addEventListener("click", (e) => {
-        const endpoint = `/blogs/${trashcan.dataset.doc}`;
+        const endpoint = `/groups/${trashcan.dataset.doc}`;
 
         fetch(endpoint, { method: "DELETE" })
           .then((response) => response.json())

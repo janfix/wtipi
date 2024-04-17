@@ -69,17 +69,7 @@
      margin-left: 20px;
  }
 
- /* index styles */
- .blogs a {
-     display: block;
-     margin: 40px 0;
-     padding-left: 30px;
-     border-left: 6px solid crimson;
- }
 
- .blogs a:hover h3 {
-     color: crimson;
- }
 
  .info{
     display: flex;
@@ -105,6 +95,29 @@
     border-top: 3px solid teal;
     border-bottom: 3px solid crimson;
     box-shadow: 1px 2px 3px rgba(0, 0, 0, 0.2);
+}
+
+ /* index styles */
+.single h3 {
+    color: teal;
+}
+
+.single h3:hover {
+    color: crimson;
+}
+
+
+.single{
+    display: block;
+    margin: 40px 0;
+    padding-left: 30px;
+    border-left: 6px solid crimson;
+}
+
+
+.single:hover{
+    border-left : 6px solid teal;   
+    box-shadow:  1px 2px 3px rgba(0, 0, 0, 0.2);
 }
 
  .start {
@@ -137,7 +150,7 @@
 
  /* create styles */
  .create-blog form {
-     max-width: 400px;
+     max-width: 650px;
      margin: 0 auto;
  }
 
@@ -155,7 +168,8 @@
  }
 
  textarea {
-     height: 120px;
+     width: 100%;
+     height: 150px;
  }
 
  .create-blog button {
@@ -175,7 +189,7 @@
  }
 
  form {
-     width: 360px;
+     width: 600px;
      margin: 0 auto;
      padding: 30px;
      box-shadow: 1px 2px 3px rgba(0, 0, 0, 0.1);
@@ -199,7 +213,7 @@
  button {
      margin-top: 30px;
      border-radius: 36px;
-     background: crimson;
+     background: teal;
      border: 0;
      text-transform: uppercase;
      font-weight: 700;
@@ -208,10 +222,73 @@
      padding: 10px 16px;
      letter-spacing: 2px;
      cursor: pointer;
+     color:whitesmoke;
  }
 
  #user-data{
-    color: crimson;
+    color: teal;
     font-size: x-small;
  }
+
+.steps{
+    margin-left: 25%;
+    font-size: 15px;
+}
  
+.pubready{
+    display : none;
+    margin-left: 25%;
+    font-size: 3em;
+}
+
+ .centeredTitle{
+    max-width: 650px;
+    margin: 0 auto;
+ }
+
+ .addEntry{
+    text-align: -webkit-right;
+    text-align: -moz-right;
+ } 
+ 
+ .groups{
+    margin-top: 20px;
+ }
+
+ .buttNext{
+    width: 100%;
+    text-align: -webkit-right;
+    text-align: -moz-right;
+ }
+
+ #form-wizard .form-step {
+    transition: transform 0.3s ease-in-out;
+    width: 100%; /* Assurez-vous que la largeur correspond à votre design */
+}
+
+.form-step.moving-left {
+    transform: translateX(-100%);
+}
+
+.cache{
+    display:none;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table, th, td {
+    border: 1px solid black;
+}
+
+th, td {
+    padding: 8px;
+    text-align: left;
+}
+
+#previewArea{
+    margin-top: 20px;
+    background-color: aliceblue;
+}

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <%- include('../partials/head.ejs') %>
+  <body>
+    <%- include('../partials/nav.ejs') %>
+
+    
+    <div class="addEntry">
+      <a href="/groups/create"><button>Create a new group</button></a>
+    </div>
+    
+    <div class="groups content">  
+      <h2>Groups available for an assessment</h2>
+      <% if(groups.length > 0){ %> <% groups.forEach(group => { %>
+      <a class="single" href="/groups/<%= group._id %>">
+        <h3 class="title"><%= group.groupName %></h3>
+        <p class="snippet"><%= group.description %></p>
+      </a>
+      <% }) %> <% } else { %>
+      <p>No groups to display yet!</p>
+      <% } %>
+    
+          
+    </div>
+
+    <%- include('../partials/footer.ejs') %>
+  </body>
+</html>

@@ -7,8 +7,10 @@
     <% if(user){ %>
     <li>Welcome, <%= user.email %> - <%= user.role %></li>
     <li><a href="/">Tests</a></li>
+    <li hidden><a href="/blogs/create">New Test</a></li>
+    <li><a href="/groups">groups</a></li>
+    <li><a href="/groups">Publications</a></li>
     <li><a href="/about">About</a></li>
-    <li><a href="/blogs/create">New Test</a></li>
     <li><a href="/logout">Log out</a></li>
     <% }else{ %>
     <li><a href="/">Test</a></li>

@@ -6,6 +6,7 @@
     <%- include('../partials/nav.ejs') %>
 
       <div class="create-blog content">
+        <h1 class="centeredTitle">Upload a new test</h1>
         <form action="/upload" enctype="multipart/form-data">
           <div id="user-data" data-id="<%= user.id %>" data-email="<%= user.email %>">
             Your test will be saved based on your ID that associated with your
@@ -19,9 +20,10 @@
           <textarea id="body" name="body"
             required>Test presentation: &#13;&#10;Test type: &#13;&#10;Scoring rules:  &#13;&#10;Duration: &#13;&#10;Getting the results :  </textarea>
           <label for="testurl">Test URL (copy this url to access to the test) : </label>
-          <input type="text" id="testurl" name="testurl" value="https://wiquid.fr/14142536" />
+          <input type="text" id="testurl" name="testurl" />
           <label for="file">Upload File:</label>
           <input type="file" id="file" name="file" required />
+          
           <button type="submit">Submit</button>
         </form>
       </div>

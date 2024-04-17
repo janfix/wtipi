@@ -9,8 +9,9 @@ router.post("/", blogController.blogCreatePost);
 
 router.get("/create", requireAuth, blogController.blogCreateGet);
 
-router.get("/:id", blogController.blogDetails);
+router.get("/:id",requireAuth, blogController.blogDetails);
 
 router.delete("/:id", blogController.blogDelete);
+
 
 module.exports = router;

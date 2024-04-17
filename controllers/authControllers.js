@@ -61,10 +61,10 @@ const registerGet = (req, res) => {
 };
 
 const registerPost = async (req, res) => {
-  const { role, email, password} = req.body;
+  const { firstname, lastname, role, email, password} = req.body;
 
   try {
-    const user = await User.create({role, email, password });
+    const user = await User.create({firstname, lastname, role, email, password });
     const token = createToken(user._id);
     res.cookie("jwt", token, { httpOnly: true, maxAge: maxAge * 1000 });
     res.status(201).json({ user: user._id });
