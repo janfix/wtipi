@@ -83,55 +83,37 @@ app.get('/api/groups', async (req, res) => {
 
 //Route pour télécharger le CSV
 app.post("/uploadcsv", uploadcsv.single("csvfile"), async (req, res) => {
-
-  const activGroup = req.body.activGroup; // Extraction de activGroup
+  const activGroup = req.body.activGroup; // ID du groupe actif en MongoDB
   if (!req.file) {
     return res.status(400).send("Aucun fichier fourni.");
   }
 
   const results = [];
-  var User_id;
   fs.createReadStream(req.file.path)
     .pipe(csv({ separator: ',' }))
     .on('data', (data) => results.push(data))
     .on('end', async () => {
       try {
         for (let user of results) {
-
-          // Recherche si l'utilisateur existe déjà
           let existingUser = await User.findOne({ email: user.email });
           if (existingUser) {
-            User_id = existingUser._id;
-            // Si l'utilisateur existe, ajoutez activGroup à son tableau de groups
-            if (!existingUser.group.includes(activGroup)) {
-              existingUser.group.push(activGroup);
-              await existingUser.save();
-            }
+            // Ajoutez l'ID de l'utilisateur au groupe, s'il n'est pas déjà présent
+            const groupUpdate = await Group.findByIdAndUpdate(activGroup, { $addToSet: { students: existingUser._id } }, { new: true });
           } else {
+            // Créez un nouvel utilisateur et ajoutez-le au groupe
             const newUser = new User({
               firstname: user.firstname,
               lastname: user.lastname,
               email: user.email,
               role: "student",
-              password: user.password,
-              SID: user.id,
-              group: [activGroup]
+              password: user.password, // Assurez-vous que le mot de passe est hashé dans le modèle User
+              SID: user.id
             });
-            await newUser.save();
-            User_id = newUser._id;
-          }
-
-          
-          let AddStudentToGroup = await Group.findOne({ _id: activGroup });
-          console.log(AddStudentToGroup, User_id)
-          if (AddStudentToGroup && User_id) {
-            AddStudentToGroup.students.push(User_id)
-            await AddStudentToGroup.save();
+            const savedUser = await newUser.save();
+            const groupUpdate = await Group.findByIdAndUpdate(activGroup, { $push: { students: savedUser._id } }, { new: true });
           }
         }
         res.send("Utilisateurs importés avec succès.");
-
-
       } catch (error) {
         console.error("Erreur lors de l'enregistrement des utilisateurs : ", error);
         res.status(500).send("Erreur lors de l'importation des utilisateurs.");
@@ -141,6 +123,8 @@ app.post("/uploadcsv", uploadcsv.single("csvfile"), async (req, res) => {
       });
     });
 });
+
+
 
 
 // Route pour télécharger le fichier ZIP

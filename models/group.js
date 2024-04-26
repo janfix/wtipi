@@ -5,10 +5,7 @@ const Schema = mongoose.Schema;
 
 const groupSchema = new Schema(
   {
-    groupID: {
-      type: String,
-      required: false,
-    },
+    
     groupName: {
       type: String,
       required: false,
@@ -17,16 +14,17 @@ const groupSchema = new Schema(
       type: String,
       required: false,
     },
-    students : {
-      type: Array,
-      required : true
-    },
+    students: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    }],
     body: {
       type: String,
       required: false,
     },
     creator: {
-      type:String
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
     }
   },
   { timestamps: true }
