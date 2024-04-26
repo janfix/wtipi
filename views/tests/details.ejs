@@ -1,0 +1,75 @@
+<html lang="en">
+<%- include("../partials/head.ejs") %>
+
+  <body>
+    <%- include("../partials/nav.ejs") %>
+
+      <div class="details content">
+        <h1>Test : <%= test.title %> - Details</h1>
+
+        <div class="content">
+          <% if(user){ %>
+            <p>Informations provenant du manifest.json pour les tests provenant de TAO</p>
+            <%}%>
+              <% if(user){ %>
+                <p>Informations provenant du test.xml pour les tests provenant de TAO</p>
+                <%}%>
+                  <% if(user){ %>
+                    <div class="previewTest" style="display:none;">HERE IFRAME</div>
+                    <%}%>
+                    <button onclick="renderIframe(this)" data-testpath="<%= test.testpath %>" class="previewBT <%= test.id %>" >Preview</button>
+                      <% if(user){ %>
+                        <p>Informations provenant du monitoring</p>
+                        <%}%>
+                          <p>
+                            <%= test.body %>
+                          </p>
+        </div>
+
+        <!-- Tool Bar -->
+        <% if(user){ %>
+          <% if(user._id==test.creator){ %>
+            <a class="delete actionBT" data-doc="<%= test._id %>">
+              <img src="/img/trashcan.svg" title="Remove Assessment" alt="Delete icon" />
+            </a>
+            <a class="edit actionBT" data-doc="<%= test._id %>">
+              <img width="25px" src="/img/btEdit.png" title="Edit test information" alt="Edit Test info" />
+            </a>
+            <a class="start actionBT" data-doc="<%= test._id %>">
+              <img width="25px" src="/img/btStart.png" title="Start test" alt="Start Test" />
+            </a>
+            <% }else{%>
+              <div class="delete">Impossible</div>
+              <%}%> %> <% } %>
+
+      </div>
+
+      <%- include("../partials/footer.ejs") %>
+
+        <script>
+
+          const trashcan = document.querySelector("a.delete");
+
+          function renderIframe(buttonElement) {
+            const Tpath = buttonElement.getAttribute('data-testpath');
+            const previewContainer = document.querySelector('.previewTest');
+            previewContainer.style.display = 'block';
+            console.log(Tpath)
+            previewContainer.innerHTML = `<iframe src="/${Tpath}/"  width="100%" height="500px"  style="border:1px grey solid;" frameborder="1" allowfullscreen></iframe>`;
+
+           
+
+          }
+
+
+          trashcan.addEventListener("click", (e) => {
+            const endpoint = `/tests/${trashcan.dataset.doc}`;
+            fetch(endpoint, { method: "DELETE" })
+              .then((response) => response.json())
+              .then((data) => (window.location.href = data.redirect))
+              .catch((err) => console.log(err));
+          });
+        </script>
+  </body>
+
+</html>

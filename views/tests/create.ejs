@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../partials/head.ejs') %>
+
+  <body>
+    <%- include('../partials/nav.ejs') %>
+
+      <div class="create-test content">
+        <h1 class="centeredTitle">Upload a new test</h1>
+        <form action="/upload" enctype="multipart/form-data">
+          <div id="user-data" data-id="<%= user.id %>" data-email="<%= user.email %>">
+            Your test will be saved based on your ID that associated with your
+            email <%= user.email %>, so that other users cannot delete it.
+          </div>
+          <label for="title">Test title:</label>
+          <input type="text" id="title" name="title" required />
+          <label for="snippet">Test snippet:</label>
+          <input type="text" id="snippet" name="snippet" required />
+          <label for="body">Test presentation:</label>
+          <textarea id="body" name="body"
+            required>Test presentation: &#13;&#10;Test type: &#13;&#10;Scoring rules:  &#13;&#10;Duration: &#13;&#10;Getting the results :  </textarea>
+          <label for="subject">Subject</label>
+          <input type="text" id="subject" name="subject" />
+          <label for="file">Upload File (zip package only):</label>
+          <input type="file" id="file" name="file" required />
+          
+          <button type="submit">Submit</button>
+        </form>
+      </div>
+
+      <script>
+        const form = document.querySelector("form");
+        const testError = document.querySelector(".test.error");
+
+        form.addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          //LOGIC FORMDATA
+          const formData = new FormData(form);
+
+          //LOGIC FILEDATA
+          const fileData = new FormData(); // Création d'un FormData spécifique pour le fichier
+          
+          // Appel de la fonction et affichage du code unique dans la console
+          const uniCode = generateUniqueCode();
+          console.log(uniCode);
+
+          // Extrayez uniquement le fichier et préparez un FormData dédié
+          fileData.append('file', formData.get('file'));
+          fileData.append('IDcode', uniCode);
+
+          // get the text-form values
+          const title = form.title.value;
+          const snippet = form.snippet.value;
+          const body = form.body.value;
+          const subject = form.subject.value;
+
+          // get the path 
+          const fpath = form.file.value;
+
+          const userElement = document.getElementById("user-data");
+          const userData = {
+            id: userElement.getAttribute("data-id"),
+            email: userElement.getAttribute("data-email"),
+          };
+
+          const creator = userData.id;
+          console.log("user: ", userData.email);
+
+          const testData = {
+            title,
+            creator,
+            snippet,
+            body,
+            subject,
+            uniCode
+          };
+
+          try {
+            const res = await fetch("/tests", {
+              method: "POST",
+              body: JSON.stringify(testData),
+              headers: { "content-Type": "application/json" },
+            }).then((result) => {
+              if (result) {
+                location.assign("/");
+              }
+            });
+          } catch (error) {
+            console.log(error);
+          }
+
+          try {
+            // Envoi du fichier
+            const fileResponse = await fetch('/upload', {
+              method: 'POST',
+              body: fileData,
+              IDcode : uniCode 
+            });
+            console.log(fileResponse)
+            if (fileResponse.ok) {
+              console.log("Upload du fichier réussi");
+            } else {
+              console.error("Échec de l'upload du fichier");
+            }
+          } catch (error) {
+            console.error("Erreur lors de l'envoi du fichier :", error);
+          }
+
+
+        });
+
+       
+
+        function generateUniqueCode() {
+          const array = new Uint8Array(4);
+          window.crypto.getRandomValues(array);
+          return Array.from(array, byte => byte.toString(4).padStart(2, '0')).join('');
+        }
+
+        
+
+      </script>
+
+      <%- include('../partials/footer.ejs') %>
+  </body>
+
+</html>

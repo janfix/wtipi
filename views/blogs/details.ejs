@@ -17,13 +17,13 @@
       <!-- Tool Bar -->
       <% if(user){ %> <% if(user._id == blog.creator){ %>
       <a class="delete actionBT" data-doc="<%= blog._id %>">
-        <img src="/trashcan.svg" title="Remove Assessment" alt="Delete icon" />
+        <img src="/img/trashcan.svg" title="Remove Assessment" alt="Delete icon" />
       </a>
       <a class="edit actionBT" data-doc="<%= blog._id %>">
-        <img width="25px" src="/btEdit.png" title="Edit test information" alt="Edit Test info" />
+        <img width="25px" src="/img/btEdit.png" title="Edit test information" alt="Edit Test info" />
       </a>
       <a class="start actionBT" data-doc="<%= blog._id %>">
-        <img width="25px" src="/btStart.png" title="Start test" alt="Start Test" />
+        <img width="25px" src="/img/btStart.png" title="Start test" alt="Start Test" />
       </a>
       <% }else{%><div class="delete">Impossible</div> 
       <%}%> %> <% } %>

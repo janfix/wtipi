@@ -1,0 +1,108 @@
+<html lang="en">
+<%- include("../partials/head.ejs") %>
+
+  <body>
+    <%- include("../partials/nav.ejs") %>
+
+      <div class="details content">
+
+        <h1>Publication details : <%= publication.title %>
+        </h1>
+
+        <%- include("../partials/publicationTab.ejs") %>
+
+        <!-- Tool Bar -->
+        <% if(user){ %>
+          <% if(user._id==publication.creator){ %>
+            <a class="delete actionBT" data-doc="<%= publication._id %>">
+              <img src="/img/trashcan.svg" title="Remove Assessment" alt="Delete icon" />
+            </a>
+            <a class="edit actionBT" data-doc="<%= publication._id %>">
+              <img width="25px" src="/img/btEdit.png" title="Edit test information" alt="Edit Test info" />
+            </a>
+            <a class="start actionBT" data-doc="<%= publication._id %>">
+              <img width="25px" src="/img/btStart.png" title="Start test" alt="Start Test" />
+            </a>
+            <a class="seeResults actionBT" data-doc="<%= publication._id %>">
+              <img width="25px" src="/img/btStart.png" title="See Results" alt="See Results" />
+            </a>
+            <% }else{%>
+              <div class="delete">Impossible</div>
+              <%}%>
+                <% } %>
+
+      </div>
+
+      <%- include("../partials/footer.ejs") %>
+
+        <script>
+
+          //TAB SYSTEM
+          $(document).ready(function () {
+            $('.tab-links a').on('click', function (e) {
+              var currentAttrValue = $(this).attr('href');
+
+              // Afficher l'onglet actif
+              $('.tabs ' + currentAttrValue).show().siblings().hide();
+
+              // Changer l'onglet actif
+              $(this).parent('li').addClass('active').siblings().removeClass('active');
+
+              e.preventDefault();
+            });
+          });
+
+          function drawProgressBar(width, progress) {
+            const percentage = progress * 100;
+            const progressMarks = Math.floor(progress * width);
+            const emptyMarks = width - progressMarks;
+            const progressBar = '[' + '🟩'.repeat(progressMarks) + (progressMarks < width ? '>' : '') + ' '.repeat(emptyMarks) + ']';
+
+            return `${progressBar} ${percentage.toFixed(2)}%`;
+          }
+
+
+          document.addEventListener("DOMContentLoaded", function () {
+            const endpoint = `/publications/<%= publication._id %>/students`;
+
+            $("#server").html("<%= publication.server %>");
+            $("#testURL").html("<%= publication.testurl %>");
+            $("#linkToTest").attr("href","<%= publication.server %>/test<%= publication.testurl %>");
+
+
+
+            fetch(endpoint)
+              .then(response => response.json())
+              .then(data => {
+                const tbody = document.querySelector("#studentsList tbody");
+                const studentCountSpan = document.querySelector("#studentCount");
+                studentCountSpan.textContent = data.length; // Met à jour le nombre d'étudiants
+                data.forEach(student => {
+                  tbody.innerHTML += `
+                <tr>
+                  <td hidden>${student._id}</td>
+                  <td>${student.firstname}</td>
+                  <td>${student.lastname}</td>
+                  <td>${student.email}</td>
+                  <td>${student.SID}</td>
+                  <td>Confirmed</td>
+                  <td>Processing : ${drawProgressBar(10, 0.2345)}</td>
+                  <td><img class="actionBT" title="More Info on this Student" width="25px" src="/img/user-info.svg"/> <img class="actionBT" title="Edit Student" width="25px" src="/img/btEdit.png"/> <img class="actionBT" title="delete Student" src="/img/deleteCross.svg"></td>
+                </tr>`;
+                });
+              })
+              .catch(err => console.error('Error loading students:', err));
+          });
+
+          const trashcan = document.querySelector("a.delete");
+          trashcan.addEventListener("click", (e) => {
+            const endpoint = `/publications/${trashcan.dataset.doc}`;
+            fetch(endpoint, { method: "DELETE" })
+              .then((response) => response.json())
+              .then((data) => (window.location.href = data.redirect))
+              .catch((err) => console.log(err));
+          });
+        </script>
+  </body>
+
+</html>

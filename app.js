@@ -2,8 +2,10 @@ require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const blogRoutes = require("./routes/blogRoutes");
+const testRoutes = require("./routes/testRoutes");
 const groupRoutes = require("./routes/groupRoutes");
 const authRoutes = require("./routes/authRoutes");
+const publicationRoutes = require("./routes/publicationRoutes");
 const cookieParser = require("cookie-parser");
 const multer = require("multer");
 const AdmZip = require("adm-zip");
@@ -16,7 +18,10 @@ const uploadcsv = multer({ dest: 'uploadcsv/' });
 const dbURI = process.env.DB_URI;
 const csv = require('csv-parser');
 const Group = require("./models/group")
-const User = require("./models/User"); 
+const User = require("./models/User");
+const Test = require("./models/Test");
+
+
 
 
 mongoose
@@ -26,102 +31,155 @@ mongoose
 
 app.set("view engine", "ejs");
 
-app.use(express.static("public"));
+//app.use(express.static("public"));
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+app.use((req, res, next) => {
+  res.locals.currentPage = 'tests'; // Vous pouvez mettre une valeur par défaut ici
+  next();
+});
+
 
 // Insérer ici la vérification de l'utilisateur pour toutes les routes
 app.get("*", checkUser);
 
 app.get("/", (req, res) => {
-  res.redirect("/blogs");
+  res.redirect("/tests");
 });
 
 app.get("/about", (req, res) => {
-  res.render("about", { title: "About" });
+  res.render("about", { title: "About", currentPage: 'about' });
 });
+
+//Route API 1 pour obtenir les listes des tests, groupes et publications
+
+app.get('/api/tests', async (req, res) => {
+  try {
+    const tests = await Test.find();
+    res.json(tests);
+  } catch (error) {
+    console.error("Database access error:", error); // This will log the detailed error
+    res.status(500).send("Failed to get tests");
+  }
+});
+
+app.get('/api/groups', async (req, res) => {
+  try {
+    const groups = await Group.find(); // Assuming 'Group' is your Mongoose model for groups
+    res.json(groups);
+  } catch (error) {
+    res.status(500).send("Failed to get groups");
+  }
+});
+
+//Reach Test Preview
+
+
+
 
 
 //Route pour télécharger le CSV
-app.post("/upload-csv", uploadcsv.single("csvFile"), async (req, res) => {
-  const results = [];
+app.post("/uploadcsv", uploadcsv.single("csvfile"), async (req, res) => {
 
+  const activGroup = req.body.activGroup; // Extraction de activGroup
+  if (!req.file) {
+    return res.status(400).send("Aucun fichier fourni.");
+  }
+
+  const results = [];
+  var User_id;
   fs.createReadStream(req.file.path)
-      .pipe(csv({ separator: ',' }))
-      .on('data', (data) => results.push(data))
-      .on('end', async () => {
-          try {
-              for (let user of results) {
-                  const newUser = new User({
-                      firstname: user.firstname,
-                      lastname: user.lastname,
-                      email: user.email,
-                      password: user.password,
-                      SID: user.id,
-                      group: ["nom du groupe actuel"] // Remplacer par le groupe réel si nécessaire
-                  });
-                  await newUser.save();
-              }
-              res.send("Utilisateurs importés avec succès.");
-          } catch (error) {
-              console.error("Erreur lors de l'enregistrement des utilisateurs : ", error);
-              res.status(500).send("Erreur lors de l'importation des utilisateurs.");
-          }
-          fs.unlink(req.file.path, (err) => {
-              if (err) console.error("Erreur lors de la suppression du fichier temporaire", err);
-          });
-      });
-});
-
-/* app.post('/uploadcsv', uploadcsv.single('file'), (req, res) => {
-  console.log("CSV TREATMENT")
-  const results = [];
-  const tempPath = req.file.path;
-  fs.createReadStream(tempPath)
-    .pipe(csv())
+    .pipe(csv({ separator: ',' }))
     .on('data', (data) => results.push(data))
-    .on('end', () => {
-      // Assumer que chaque ligne a un champ 'id'
-      const studentIds = results.map(row => row.id);
-      console.log(studentIds);
-      const newGroup = new Group({
-        students: studentIds
-      });
-      newGroup.save().then(() => {
-        fs.unlink(tempPath, (err) => { // Nettoyage du fichier temporaire
-          if (err) console.error("Error deleting temp file", err);
-        });
-        res.send('File uploaded and students inserted into MongoDB.');
-      }).catch(err => {
-        console.error(err);
-        res.status(500).send('Error inserting data into MongoDB');
+    .on('end', async () => {
+      try {
+        for (let user of results) {
+
+          // Recherche si l'utilisateur existe déjà
+          let existingUser = await User.findOne({ email: user.email });
+          if (existingUser) {
+            User_id = existingUser._id;
+            // Si l'utilisateur existe, ajoutez activGroup à son tableau de groups
+            if (!existingUser.group.includes(activGroup)) {
+              existingUser.group.push(activGroup);
+              await existingUser.save();
+            }
+          } else {
+            const newUser = new User({
+              firstname: user.firstname,
+              lastname: user.lastname,
+              email: user.email,
+              role: "student",
+              password: user.password,
+              SID: user.id,
+              group: [activGroup]
+            });
+            await newUser.save();
+            User_id = newUser._id;
+          }
+
+          
+          let AddStudentToGroup = await Group.findOne({ _id: activGroup });
+          console.log(AddStudentToGroup, User_id)
+          if (AddStudentToGroup && User_id) {
+            AddStudentToGroup.students.push(User_id)
+            await AddStudentToGroup.save();
+          }
+        }
+        res.send("Utilisateurs importés avec succès.");
+
+
+      } catch (error) {
+        console.error("Erreur lors de l'enregistrement des utilisateurs : ", error);
+        res.status(500).send("Erreur lors de l'importation des utilisateurs.");
+      }
+      fs.unlink(req.file.path, (err) => {
+        if (err) console.error("Erreur lors de la suppression du fichier temporaire", err);
       });
     });
-
-
-}) */
+});
 
 
 // Route pour télécharger le fichier ZIP
-app.post('/upload', upload.single('file'), (req, res) => {
+app.post('/upload', upload.single('file'), async (req, res) => {
   if (!req.file) {
     console.log('Route /upload atteinte');
     return res.status(400).send('No file uploaded.');
   } else {
-    try {     
+    const uniCode = req.body.IDcode;
+    const uniq = "test" + uniCode;
+    console.log(uniCode)
+    try {
       // Chemin où le fichier ZIP téléchargé est temporairement stocké
       const tempPath = req.file.path;
-      console.log(tempPath)
-        console.log("ZIP TREATMENT");
-        const zip = new AdmZip(tempPath);
-        const zipEntries = zip.getEntries(); // Un tableau des entrées (fichiers/dossiers) du ZIP
-        let uniq = "test" + Date.now()
-        zipEntries.forEach(entry => {
-          let entryName = entry.entryName;
-          zip.extractEntryTo(entry, 'testing/' + uniq + `/${req.file.originalname}/`, false, true);
-        });
-      res.send("Fichier extrait !");
+      var testurl;
+      console.log("ZIP TREATMENT");
+      const zip = new AdmZip(tempPath);
+
+      // Extraction du contenu du ZIP en préservant la structure des répertoires
+      zip.extractAllTo(/*target path*/'public/testing/' + uniq, /*overwrite*/true);
+
+      try {
+        // Enregistrement du chemin du fichier dans la base de données
+        testurl = 'testing/' + uniq;
+        const existingTest = await Test.findOne({ uniCode: uniCode });
+        console.log("Test existant:", existingTest);
+        if (existingTest) {
+          await Test.findOneAndUpdate({ uniCode: uniCode }, { testpath: testurl }, { new: true });
+        } else {
+          console.log("Aucun test correspondant trouvé pour ce uniCode");
+          // Gérer l'absence de document ici, peut-être en renvoyant une erreur ou en informant l'utilisateur
+        }
+
+
+        res.send("Fichier uploadé et chemin enregistré !");
+      } catch (error) {
+        console.error("Erreur d'enregistrement dans MongoDB:", error);
+        res.status(500).send("Erreur du serveur.");
+      }
     } catch (error) {
       console.log(error);
       res.status(500).send('Server error.');
@@ -129,8 +187,26 @@ app.post('/upload', upload.single('file'), (req, res) => {
   }
 });
 
-app.use("/blogs", blogRoutes);
-app.use("/groups", groupRoutes);
+app.use("/tests", (req, res, next) => {
+  res.locals.currentPage = 'tests'; // `res.locals` rend la variable disponible dans toutes les vues
+  next();
+},testRoutes);
+
+
+app.use("/blogs",(req, res, next) => {
+  res.locals.currentPage = 'blogs';
+  next();
+}, blogRoutes);
+
+app.use("/groups",(req, res, next) => {
+  res.locals.currentPage = 'groups';
+  next();
+}, groupRoutes);
+
+app.use("/publications",(req, res, next) => {
+  res.locals.currentPage = 'publications';
+  next();
+}, publicationRoutes);
 
 app.use(authRoutes);
 

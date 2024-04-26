@@ -10,7 +10,9 @@
     </div>
     
     <div class="groups content">  
-      <h2>Groups available for an assessment</h2>
+      <h1>Groups available for an assessment</h1>
+      <div style ="margin-bottom: 20px;">To add users, you must create a group and import a CSV file that respects the expected user data structure.</div>
+
       <% if(groups.length > 0){ %> <% groups.forEach(group => { %>
       <a class="single" href="/groups/<%= group._id %>">
         <h3 class="title"><%= group.groupName %></h3>

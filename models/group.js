@@ -17,10 +17,10 @@ const groupSchema = new Schema(
       type: String,
       required: false,
     },
-    students: [{
-      type: String,
-      ref: 'id' 
-    }],
+    students : {
+      type: Array,
+      required : true
+    },
     body: {
       type: String,
       required: false,

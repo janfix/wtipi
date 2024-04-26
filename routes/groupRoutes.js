@@ -13,5 +13,6 @@ router.get("/:id",requireAuth, groupController.groupDetails);
 
 router.delete("/:id", groupController.groupDelete);
 
+router.get("/:id/students", requireAuth, groupController.studentList);
 
 module.exports = router;

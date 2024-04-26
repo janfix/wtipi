@@ -35,10 +35,12 @@
         form.addEventListener("submit", async (e) => {
           e.preventDefault();
 
-          console.log(form)
+          //LOGIC FORMDATA
           const formData = new FormData(form);
-          console.log(formData.get('file'))
+
+          //LOGIC FILEDATA
           const fileData = new FormData(); // Création d'un FormData spécifique pour le fichier
+          
           // Extrayez uniquement le fichier et préparez un FormData dédié
           fileData.append('file', formData.get('file'));
 

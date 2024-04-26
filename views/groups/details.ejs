@@ -1,50 +1,97 @@
 <html lang="en">
-  <%- include("../partials/head.ejs") %>
+<%- include("../partials/head.ejs") %>
 
   <body>
     <%- include("../partials/nav.ejs") %>
 
-    <div class="details content">
-      <h2><%= group.title %></h2>
-      
-      
-      <div class="content">
-        <p><%= group.groupName %></p>
-        <p><%= group.description %></p>
-        <p><%= group.createdAt %></p>
-        
-        <p><%= group.body %></p>
+      <div class="details content">
+        <h1>Group : <%= group.groupName %> - Details</h1>
+        <div class="content">
+          <p>
+            <%= group.description %>
+          </p>
+          <p>
+            <%= group.createdAt %>
+          </p>
+
+          <p>
+            <%= group.body %>
+          </p>
+        </div>
+        <div id="studentsList">
+          <h2 style="color :teal; margin-top: 20px; margin-bottom: 0px; ">Students in Publication (<span
+              id="studentCount">0</span>)</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Email</th>
+                <th>SID</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Les étudiants seront ajoutés ici par JavaScript -->
+            </tbody>
+          </table>
+        </div>
+
+
+        <!-- Tool Bar -->
+        <% if(user){ %>
+          <% if(user._id==group.creator){ %>
+            <a class="delete actionBT" data-doc="<%= group._id %>">
+              <img src="/img/trashcan.svg" title="Remove Assessment" alt="Delete icon" />
+            </a>
+            <a class="edit actionBT" data-doc="<%= group._id %>">
+              <img width="25px" src="/img/btEdit.png" title="Edit test information" alt="Edit Test info" />
+            </a>
+            <a class="start actionBT" data-doc="<%= group._id %>">
+              <img width="25px" src="/img/btStart.png" title="Start test" alt="Start Test" />
+            </a>
+            <% }else{%>
+              <div class="delete">Impossible</div>
+              <%}%> %> <% } %>
+
       </div>
 
-      <!-- Tool Bar -->
-      <% if(user){ %> <% if(user._id == group.creator){ %>
-      <a class="delete actionBT" data-doc="<%= group._id %>">
-        <img src="/trashcan.svg" title="Remove Assessment" alt="Delete icon" />
-      </a>
-      <a class="edit actionBT" data-doc="<%= group._id %>">
-        <img width="25px" src="/btEdit.png" title="Edit test information" alt="Edit Test info" />
-      </a>
-      <a class="start actionBT" data-doc="<%= group._id %>">
-        <img width="25px" src="/btStart.png" title="Start test" alt="Start Test" />
-      </a>
-      <% }else{%><div class="delete">Impossible</div> 
-      <%}%> %> <% } %>
-      
-    </div>
+      <%- include("../partials/footer.ejs") %>
 
-    <%- include("../partials/footer.ejs") %>
+        <script>
 
-    <script>
-      const trashcan = document.querySelector("a.delete");
+          document.addEventListener("DOMContentLoaded", function () {
+            const endpoint = `/groups/<%= group._id %>/students`;
+            fetch(endpoint)
+              .then(response => response.json())
+              .then(data => {
+                const tbody = document.querySelector("#studentsList tbody");
+                const studentCountSpan = document.querySelector("#studentCount");
+                studentCountSpan.textContent = data.length; // Met à jour le nombre d'étudiants
+                data.forEach(student => {
+                  tbody.innerHTML += `
+                <tr>
+                  <td>${student.firstname}</td>
+                  <td>${student.lastname}</td>
+                  <td>${student.email}</td>
+                  <td>${student.SID}</td>
+                </tr>`;
+                });
+              })
+              .catch(err => console.error('Error loading students:', err));
+          });
 
-      trashcan.addEventListener("click", (e) => {
-        const endpoint = `/groups/${trashcan.dataset.doc}`;
 
-        fetch(endpoint, { method: "DELETE" })
-          .then((response) => response.json())
-          .then((data) => (window.location.href = data.redirect))
-          .catch((err) => console.log(err));
-      });
-    </script>
+
+          const trashcan = document.querySelector("a.delete");
+          trashcan.addEventListener("click", (e) => {
+            const endpoint = `/groups/${trashcan.dataset.doc}`;
+
+            fetch(endpoint, { method: "DELETE" })
+              .then((response) => response.json())
+              .then((data) => (window.location.href = data.redirect))
+              .catch((err) => console.log(err));
+          });
+        </script>
   </body>
+
 </html>

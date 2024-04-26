@@ -1,22 +1,22 @@
 <nav>
   <div class="site-title">
-    <a href="/"><h1>WTP<img class="logotipi" src="../tipis.png"/></h1></a>
+    <a href="/"><h1>WTP<img class="logotipi" src="../img/tipis.png"/></h1></a>
     <p>WTest-Platform</p>
   </div>
   <ul>
     <% if(user){ %>
     <li>Welcome, <%= user.email %> - <%= user.role %></li>
-    <li><a href="/">Tests</a></li>
-    <li hidden><a href="/blogs/create">New Test</a></li>
-    <li><a href="/groups">groups</a></li>
-    <li><a href="/groups">Publications</a></li>
-    <li><a href="/about">About</a></li>
+    <li><a href="/" class="<%= currentPage === 'tests' ? 'active-link' : '' %>">Tests</a></li>
+    <li><a href="/groups" class="<%= currentPage === 'groups' ? 'active-link' : '' %>">Groups</a></li>
+    <li><a href="/publications" class="<%= currentPage === 'publications' ? 'active-link' : '' %>">Publications</a></li>
+    <li><a href="/about" class="<%= currentPage === 'about' ? 'active-link' : '' %>">About</a></li>
     <li><a href="/logout">Log out</a></li>
     <% }else{ %>
-    <li><a href="/">Test</a></li>
-    <li><a href="/about">About</a></li>
+    <li><a href="/" class="<%= currentPage === 'test' ? 'active-link' : '' %>">Test</a></li>
+    <li><a href="/about" class="<%= currentPage === 'about' ? 'active-link' : '' %>">About</a></li>
     <li><a href="/login">Log in</a></li>
-    <li><a href="/register" class="btn">Register</a></li>
+    <li><a href="/register" class="btn <%= currentPage === 'register' ? 'active-link' : '' %>">Register</a></li>
     <% } %>
   </ul>
+  
 </nav>

@@ -1,0 +1,233 @@
+<style>
+    /* styles.css ou dans une balise <style> dans votre fichier EJS */
+    .tabs {
+        width: 100%;
+    }
+
+    .tab-links {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .tab-links li {
+        display: inline-block;
+        margin-right: 4px;
+    }
+
+    .tab-links a {
+        padding: 9px 15px;
+        display: inline-block;
+        border-radius: 3px 3px 0 0;
+        background: #a2d9ce;
+        font-size: 16px;
+        font-weight: bold;
+        color: #444;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 3px 1px rgba(0, 0, 0, 0.1)
+    }
+
+    .tab-links a:hover {
+        background: #77bfa3;
+        text-decoration: none;
+    }
+
+    li.active a,
+    li.active a:hover {
+        background: #fff;
+        color: #4c4c4c;
+    }
+
+    .tab-content {
+        padding: 15px;
+        border-radius: 3px;
+        box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+        background: #fff;
+    }
+
+    .tab {
+        display: none;
+    }
+
+    .tab.active {
+        display: block;
+    }
+
+    h2 {
+        color: teal;
+        margin-top: 20px;
+        margin-bottom: 0px;
+    }
+
+    blink {
+        animation: blinker 0.6s linear infinite;
+        color: #1c87c9;
+    }
+
+    @keyframes blinker {
+        50% {
+            opacity: 0;
+        }
+    }
+
+    .blink-one {
+        animation: blinker-one 1s linear infinite;
+    }
+
+    @keyframes blinker-one {
+        0% {
+            opacity: 0;
+        }
+    }
+
+    .blink-two {
+        animation: blinker-two 1.4s linear infinite;
+    }
+
+    @keyframes blinker-two {
+        100% {
+            opacity: 0;
+        }
+    }
+</style>
+
+
+<div class="tabs">
+    <ul class="tab-links">
+        <li class="active"><a href="#tab1">Synthesis</a></li>
+        <li><a href="#tab2">Parameters</a></li>
+        <li><a href="#tab3">Students</a></li>
+        <li><a href="#tab4">Results</a></li>
+        <li><a href="#tab5">Test Analysis</a></li>
+    </ul>
+
+    <div class="tab-content">
+        <div id="tab1" class="tab active">
+            <h2>Synthesis</h2>
+            <p>Publication snippet : <%= publication.snippet %>
+            </p>
+            <p>Subject : Mathematics</p>
+            <p>Number of questions : 130</p>
+            <p>Estimated duration : 2 hours</p>
+            <p>Level : Grade 2</p>
+            <p>Session(s) : 1 (how many connection to do the test)</p>
+            <p>Difficulty : Beginner (Beginner | Expected |difficult)</p>
+            <p>Difficulty for linguistics skills : [European :A1..C3]</p>
+            <p>Test normalized : Score Brut | Score Echelloné | percentiles | Déciles et quartiles | Ecart Type</p>
+            <p>Group (name) :</p>
+            <p>Academic Institution name : Lycée Pierre de Fermat</p>
+            <p>Group Speciality sector : Ecole Préparatoire Math-Physique </p>
+            <p>Test (name) : </p>
+            <!--  <p>Test id : <%= publication.testGroup[0].groupID %></p> -->
+            <p>Status : <span style="color:red" class="blink-two">PROCESSING</span> <!-- <%= publication.status %> -->
+            </p>
+            <p>Starting date : <%= publication.startOn %>
+            </p>
+            <p>Ending date : <%= publication.endOn %>
+            </p>
+
+        </div>
+        <div id="tab2" class="tab">
+            <h2>Parameters</h2>
+            <p><b>Test URL: </b><a id="linkToTest"><span id="server"></span>/test<span id="testURL"></span></a></p>
+            <p>Main description: <%= publication.body %>
+                    <p>Publication author: </p>
+                    <p>Results treatment to student : Score Automatic sent by mail</p>
+                    <p>Group result report : Automatic sent by mail to Group Supervisor</p>
+                    <!--  <p>Publication creator id : <%= publication.creator %> -->
+
+        </div>
+        <div id="tab3" class="tab">
+            <h2>Students in Publication (<span id="studentCount">0</span>) <img class="addStudent"
+                    title="Add new student" src="/img/user-plus.svg" />
+            </h2>
+            <div style="color:red" class="blink-two">Warning : You can't modify anymore the student list : the
+                assessment has started </div>
+            <p>Target group id : <%= publication.testGroup[0].testID %>
+                    <p>Group name : </p>
+                    <div id="studentsList">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>First Name</th>
+                                    <th>Last Name</th>
+                                    <th>Email</th>
+                                    <th>SID</th>
+                                    <th>Mail Status</th>
+                                    <th>Test Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Les étudiants seront ajoutés ici par JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+        </div>
+        <div id="tab4" class="tab">
+            <h2>Data constitution</h2>
+            Not started | Processing | Accomplished
+            <h2>Results</h2>
+            <p><b>Sending Results to ...</b></p>
+            <p>🟦 Student (individual score/ individual correction / individual report): </p>
+            <p>🟦 Group supervisor(s):</p>
+
+
+            <h2>Students Results Synthesis</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Email</th>
+                        <th>SID</th>
+                        <th>Total score</th>
+                        <th>Empty Answers</th>
+                        <th>Result Process</th>
+                        <th>Duration</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Les étudiants seront ajoutés ici par JavaScript -->
+                </tbody>
+            </table>
+        </div>
+        <div id="tab5" class="tab">
+            <h2>Data constitution</h2>
+            Not started | Processing | Accomplished
+            <h2>Test Structure</h2>
+            <p>Test navigation type : Linear</p>
+            <p>Revision/resumption possible : false</p>
+            <p>Randomized item order : true </p>
+            <p>Randomized item response</p>
+            <p>Randomized item value</p>
+            <p>
+                <table>
+                    <th>Question code</th>
+                    <th>Interaction Type</th>
+                    <th>Proctoring option</th>
+                    <th>Succes rate %</th>
+                    <th>Item Difficulty</th>
+                    <th>Item Discrimination</th>
+                    <th>Reliability (Alpha)</th>
+                    <th>Average time</th>
+                    <th>Correction type</th>
+                </table>
+            </p>
+
+            <h2>Test analysis</h2>
+            <p>Taux de réussite global</p>
+            <p hidden>Taux de réussite par question</p>
+            <p>Distribution des scores</p>
+            <p>Test normalized : Score Brut | Score Echelloné | percentiles | Déciles et quartiles | Ecart Type</p>
+            <p>Analyse de l'item (Graphs): </p>
+            <p hidden>Difficulté de l'item (% de réponses correcte)</p>
+            <p hidden>Discrimination de l'item (corrélation entre le score de la question et le score total du test)</p>
+            <p hidden>Coefficient de fiabilité : Cronbach's Alpha</p>
+            <p>Analyse des réponses distractrices</p>
+            <p hidden>Temps passé par question</p>
+            <p>Analyse des réponses ouvertes</p>
+        </div>
+    </div>
+</div>

@@ -18,7 +18,7 @@ const userSchema = new Schema({
     type : Array
   },
   SID : {
-    type : Number
+    type : String
   },
   email: {
     type: String,
@@ -33,6 +33,9 @@ const userSchema = new Schema({
     minlength: [6, "Minimun password length is 6 characters."],
   },
   tests:{
+    type : Array
+  },
+  publication:{
     type : Array
   }
 });

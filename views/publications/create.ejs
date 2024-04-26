@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../partials/head.ejs') %>
+
+  <body>
+    <%- include('../partials/nav.ejs') %>
+
+      <div class="create-publication content">
+        <h1 class="centeredTitle">Create a new publication</h1>
+        <form  enctype="multipart/form-data">
+          <div id="user-data" data-id="<%= user.id %>" data-email="<%= user.email %>">
+            Your publication will be saved based on your ID that associated with your
+            email <%= user.email %>.
+          </div>
+          <label for="title">Publication title:</label>
+          <input type="text" id="title" name="title" required />
+          <label for="snippet">Publication snippet:</label>
+          <input type="text" id="snippet" name="snippet" required />
+          <label for="body">Publication presentation:</label>
+          <textarea id="body" name="body" required></textarea>
+          <label for="testIDs">Pick a test : </label>
+          <select id="testIDs" name="testIDs" required>
+            <option value="">Select a test</option>
+          </select>
+          <label for="groupIDs">Pick a group :</label>
+          <select id="groupIDs" name="groupIDs" required>
+            <option value="" data-sid="">Select a group</option>
+          </select>
+          <label for="startOn">Start on (pick a date): </label>
+          <input type="date" id="startOn" name="startOn" />
+          <label for="endOn">End on (pick a date) : </label>
+          <input type="date" id="endOn" name="endOn" />
+          <label for="pubserver">Choose a server: </label>
+          <select name="pubserver" id="pubserver">
+            <option selected="selected" value="http://localhost:3000/publications">Serveur local</option>
+            <option value="DistantServer1" disabled>Distant server 1</option>
+            <option value="DistantServer2" disabled>Distant server 2</option>
+            <option value="DistantServer3" disabled>Distant server 3</option>
+          </select>
+          <input type="text" id="unicode" name="unicode"  />
+
+          <button type="submit">Submit</button>
+        </form>
+      </div>
+
+      <script>
+        const form = document.querySelector("form");
+        const publicationError = document.querySelector(".publication.error");
+        var studentIDs;
+        var testUnicode;
+        $("#unicode").val(generateUniqueCode());
+
+        function generateUniqueCode() {
+          const array = new Uint8Array(4);
+          window.crypto.getRandomValues(array);
+          return Array.from(array, byte => byte.toString(4).padStart(2, '0')).join('');
+        }
+
+        // Get List Tests and Groups for SELECT
+        document.addEventListener("DOMContentLoaded", function () {
+          fetchTests();
+          fetchGroups();
+          
+        });
+
+        function fetchTests() {
+          fetch('/api/tests')
+            .then(response => response.json())
+            .then(tests => {
+              const select = document.getElementById('testIDs');
+              tests.forEach(test => {
+                const option = document.createElement('option');
+                console.log(test)
+                option.value = test._id; // _MongoID'
+                option.textContent = test.title; // Assuming each test has a 'name'
+                select.appendChild(option);
+                testUnicode = test.uniCode;
+                
+              });
+            })
+            .catch(error => console.error('Error fetching tests:', error));
+        }
+
+        function fetchGroups() {
+          fetch('/api/groups')
+            .then(response => response.json())
+            .then(groups => {
+              const select = document.getElementById('groupIDs');
+              groups.forEach(group => {
+                const option = document.createElement('option');
+                option.setAttribute('data-sid', group.students);
+                option.value = group._id; // _MongoID
+                option.textContent = group.groupName; // Assuming each group has a 'name'
+                select.appendChild(option);
+              });
+            })
+            .catch(error => console.error('Error fetching groups:', error));
+        }
+
+        //DATE PICKERS 
+        const startOn = document.getElementById("startOn");
+        const endOn = document.getElementById("endOn");
+
+        // Set the minimum date to today's date for startOn
+        startOn.min = new Date().toISOString().split("T")[0];
+
+        startOn.addEventListener("change", function () {
+          // When start date changes, set the end date's minimum to start date
+          endOn.min = startOn.value;
+        });
+
+        endOn.addEventListener("change", function () {
+          // When end date changes, adjust the start date's maximum if necessary
+          if (endOn.value < startOn.value) {
+            startOn.value = endOn.value; // Optional: adjust start date to match end date
+          }
+        });
+
+
+
+        form.addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          //LOGIC FORMDATA
+          const formData = new FormData(form);
+
+          // get the text-form values
+          const title = form.title.value;
+          const snippet = form.snippet.value;
+          const body = form.body.value;
+          const testGroup = { testID: form.testIDs.value, groupID: form.groupIDs.value };
+          // Correction: Retrieve data-sid from the selected option in the groupIDs select
+          const selectedGroupOption = form.groupIDs.options[form.groupIDs.selectedIndex];
+          const students = selectedGroupOption.getAttribute("data-sid").split(',');
+
+
+          const startOn = form.startOn.value;
+          const endOn = form.endOn.value;
+          const status = true;
+          const server = form.pubserver.value;
+          const testurl = form.unicode.value;
+
+
+          const userElement = document.getElementById("user-data");
+          const userData = {
+            id: userElement.getAttribute("data-id"),
+            email: userElement.getAttribute("data-email"),
+          };
+
+          const creator = userData.id;
+          const publicationData = {
+            title,
+            creator,
+            snippet,
+            body,
+            testGroup,
+            students,
+            status,
+            startOn,
+            endOn,
+            server,
+            testurl,
+            testUnicode 
+          };
+
+          try {
+            const res = await fetch("/publications", {
+              method: "POST",
+              body: JSON.stringify(publicationData),
+              headers: { "content-Type": "application/json" },
+            }).then((result) => {
+              if (result) {
+                console.log(result)
+                location.assign("/publications");
+              }
+            });
+          } catch (error) {
+            console.log(error);
+          }
+
+          //Copy Tests Files to Publication directory on chosen Server
+          try {
+            const res = await fetch("/publications/create-publication", {
+              method: "POST",
+              body: JSON.stringify(publicationData),
+              headers: { "content-Type": "application/json" },
+            }).then((result) => {
+              if (result) {
+                console.log(result)
+                location.assign("/publications");
+              }
+            });
+          } catch (error) {
+            console.log(error);
+          }
+
+
+        });
+
+
+
+
+        function generateUniqueCode() {
+          const array = new Uint8Array(4);
+          window.crypto.getRandomValues(array);
+          return Array.from(array, byte => byte.toString(4).padStart(2, '0')).join('');
+        }
+
+        // Appel de la fonction et affichage du code unique dans la console
+        const uniqueCode = generateUniqueCode();
+        console.log(uniqueCode);
+
+      </script>
+
+      <%- include('../partials/footer.ejs') %>
+  </body>
+
+</html>

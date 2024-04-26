@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <%- include('../partials/head.ejs') %>
+  <body>
+    <%- include('../partials/nav.ejs') %>
+
+    <div class="addEntry">
+      <button onclick=" window.location.href = '/tests/create'" class="addTest">Import a new test</button></a>
+    </div>
+
+   
+    
+    <div class="tests content">
+       <h1>Tests available</h1>
+       <ol>
+      <% if(tests.length > 0){ %> <% tests.forEach(test => { %>
+      <a class="single" href="/tests/<%= test._id %>">
+        <h3 class="title"><%= test.title %></h3>
+        <p class="snippet"><%= test.snippet %></p>
+      </a>
+      
+      <% }) %> <% } else { %>
+      <p>No tests to display yet!</p>
+      <% } %>
+    
+      
+    
+    </div>
+
+    <%- include('../partials/footer.ejs') %>
+  </body>
+</html>
