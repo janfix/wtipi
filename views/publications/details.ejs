@@ -65,9 +65,9 @@
           document.addEventListener("DOMContentLoaded", function () {
             const endpoint = `/publications/<%= publication._id %>/students`;
 
-            $("#server").html("<%= publication.server %>");
+            $("#server").html("<%= publication.server %>/wtipiPubs");
             $("#testURL").html("<%= publication.testurl %>");
-            $("#linkToTest").attr("href","<%= publication.server %>/test<%= publication.testurl %>");
+            $("#linkToTest").attr("href","<%= publication.server %>/wtipiPubs/test<%= publication.testurl %>");
 
 
 

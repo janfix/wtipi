@@ -6,16 +6,21 @@
   <ul>
     <% if(user){ %>
     <li>Welcome, <%= user.email %> - <%= user.role %></li>
-    <li><a href="/" class="<%= currentPage === 'tests' ? 'active-link' : '' %>">Tests</a></li>
+    <% if(user.role === 'administrator') { %>
+    <li><a href="/" class="<%= currentPage === 'About' ? 'active-link' : '' %>"></a></li>
+    <li><a href="/tests" class="<%= currentPage === 'tests' ? 'active-link' : '' %>">Tests</a></li>
     <li><a href="/groups" class="<%= currentPage === 'groups' ? 'active-link' : '' %>">Groups</a></li>
     <li><a href="/publications" class="<%= currentPage === 'publications' ? 'active-link' : '' %>">Publications</a></li>
-    <li><a href="/about" class="<%= currentPage === 'about' ? 'active-link' : '' %>">About</a></li>
+    <li><a href="/register" class="btn <%= currentPage === 'register' ? 'active-link' : '' %>">Register</a></li>
+    <% } %>
     <li><a href="/logout">Log out</a></li>
+    <li><a href="/about" class="<%= currentPage === 'about' ? 'active-link' : '' %>">About</a></li>
+    
+   
     <% }else{ %>
-    <li><a href="/" class="<%= currentPage === 'test' ? 'active-link' : '' %>">Test</a></li>
     <li><a href="/about" class="<%= currentPage === 'about' ? 'active-link' : '' %>">About</a></li>
     <li><a href="/login">Log in</a></li>
-    <li><a href="/register" class="btn <%= currentPage === 'register' ? 'active-link' : '' %>">Register</a></li>
+  
     <% } %>
   </ul>
   

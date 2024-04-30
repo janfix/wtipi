@@ -19,9 +19,39 @@ const publicationschema = new Schema(
       type: String,
       required: true,
     },
+    testName : {
+       type: String,
+    },
+    groupName:{
+      type: String,
+    },
+    academicInstitutionName:{
+       type: String,
+    },
+    groupSector:{
+      type : String,
+    },
+    level:{
+      type : Number,
+    },
+    sessionLimit:{
+      type : Number
+    },
+    linguistic : {
+      type: Boolean,
+    },
+    EuropFramework : {
+      type : String,
+    },
     testGroup: { //{testId : 121121, groupId : 454545}
       type: Array,
       required: true
+    },
+    subject:{
+       type : String,
+    },
+    duration:{
+        type : String,
     },
     students : {
       type: Array,

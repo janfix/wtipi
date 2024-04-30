@@ -17,7 +17,8 @@
                   <% if(user){ %>
                     <div class="previewTest" style="display:none;">HERE IFRAME</div>
                     <%}%>
-                    <button onclick="renderIframe(this)" data-testpath="<%= test.testpath %>" class="previewBT <%= test.id %>" >Preview</button>
+                      <button onclick="renderIframe(this)" data-testpath="<%= test.testpath %>"
+                        class="previewBT <%= test.id %>">Preview</button>
                       <% if(user){ %>
                         <p>Informations provenant du monitoring</p>
                         <%}%>
@@ -57,7 +58,7 @@
             console.log(Tpath)
             previewContainer.innerHTML = `<iframe src="/${Tpath}/"  width="100%" height="500px"  style="border:1px grey solid;" frameborder="1" allowfullscreen></iframe>`;
 
-           
+
 
           }
 

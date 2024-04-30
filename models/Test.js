@@ -29,6 +29,7 @@ const testSchema = new Schema(
     uniCode : {
       type:String
     }
+
   },
   { timestamps: true }
 );

@@ -51,8 +51,11 @@
             emailError.textContent = data.errors.email;
             passwordError.textContent = data.errors.password;
           }
-          if (data.user) {
-            location.assign("/");
+          if (data.role == "administrator") {
+            console.log(data)
+            location.assign("/tests");
+          } else{
+             location.assign("/assessments/index");
           }
         } catch (err) {
           console.log(err);

@@ -46,10 +46,17 @@ const testDelete = (req, res) => {
     .catch((err) => console.log(err));
 };
 
+const testDisplay = (req, res) => {
+  const codeIDtest = req.params.codeIDtest;
+  res.render('testDetail', { iframeUrl: `/tests/${codeIDtest}/index.html` });
+};
+
+
 module.exports = {
   testList,
   testDetails,
   testCreateGet,
   testCreatePost,
   testDelete,
+  testDisplay,
 };

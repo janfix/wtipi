@@ -40,10 +40,13 @@ const userSchema = new Schema({
   }
 });
 
-// fire a function befor DOC saved to DB
+// Middleware pour hasher le mot de passe uniquement s'il est modifié
 userSchema.pre("save", async function (next) {
-  const salt = await bcrypt.genSalt();
-  this.password = await bcrypt.hash(this.password, salt);
+  // Vérifiez si le mot de passe a été modifié
+  if (this.isModified('password')) {
+    const salt = await bcrypt.genSalt();
+    this.password = await bcrypt.hash(this.password, salt);
+  }
   next();
 });
 

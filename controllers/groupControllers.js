@@ -34,10 +34,17 @@ const groupDetails = (req, res) => {
   const id = req.params.id;
   Group.findById(id)
     .then((result) => {
-      res.render("groups/details", { group: result, title: "group Details" });
+      res.render("groups/details", { 
+        group: result, 
+        title: "group Details",
+        user: res.locals.user
+       });
     })
     .catch((err) => {
-      res.status(404).render("404", { title: "group not found." });
+      res.status(404).render("404", { 
+        title: "group not found.",
+        user: res.locals.user
+      });
     });
 };
 

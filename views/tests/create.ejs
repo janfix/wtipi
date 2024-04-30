@@ -16,11 +16,24 @@
           <input type="text" id="title" name="title" required />
           <label for="snippet">Test snippet:</label>
           <input type="text" id="snippet" name="snippet" required />
-          <label for="body">Test presentation:</label>
+          <label for="body">Additional information for the students:</label>
           <textarea id="body" name="body"
-            required>Test presentation: &#13;&#10;Test type: &#13;&#10;Scoring rules:  &#13;&#10;Duration: &#13;&#10;Getting the results :  </textarea>
+            required>Test presentation : &#13;&#10;Instructions : &#13;&#10;Scoring rules:  &#13;&#10;Expected Duration: &#13;&#10;Getting the results :  </textarea>
           <label for="subject">Subject</label>
           <input type="text" id="subject" name="subject" />
+<!--      <input style="width: auto !important;" type="checkbox" id="linguistic" name="linguistic" /> This is a linguistic test  
+          <div class="linguisticTest">
+          <label for="languageLevel">Select your language proficiency level (European Framework):</label>
+          <select id="languageLevel" name="languageLevel">
+              <option selected="selected" value="NR">Not Relevant</option>
+              <option value="A1">A1 - Beginner</option>
+              <option value="A2">A2 - Elementary</option>
+              <option value="B1">B1 - Intermediate</option>
+              <option value="B2">B2 - Upper Intermediate</option>
+              <option value="C1">C1 - Advanced</option>
+              <option value="C2">C2 - Mastery</option>
+          </select> -->
+
           <label for="file">Upload File (zip package only):</label>
           <input type="file" id="file" name="file" required />
           
@@ -31,6 +44,16 @@
       <script>
         const form = document.querySelector("form");
         const testError = document.querySelector(".test.error");
+        $('.linguisticTest').hide();
+
+        $('#linguistic').change(function() {
+                if ($(this).is(':checked')) {
+                    $('.linguisticTest').show();
+                } else {
+                    $('.linguisticTest').hide();
+                    $('#languageLevel').val('NR');
+                }
+            });
 
         form.addEventListener("submit", async (e) => {
           e.preventDefault();
@@ -83,7 +106,7 @@
               headers: { "content-Type": "application/json" },
             }).then((result) => {
               if (result) {
-                location.assign("/");
+                location.assign("/tests");
               }
             });
           } catch (error) {

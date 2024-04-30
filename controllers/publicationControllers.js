@@ -17,10 +17,10 @@ const createPublication = async (req, res) => {
   const unicode = req.body.testurl; // Code unicode généré pour le répertoire
 
   // Chemin du répertoire source
-  const sourceDir = `public/testing/test${testID}`;
+  const sourceDir = `wtipiTests/test${testID}`;
 
   // Chemin du répertoire cible
-  const targetDir = `public/publications/test${unicode}`;
+  const targetDir = `wtipiPubs/test${unicode}`;
 
   try {
       // Copier le répertoire
@@ -64,7 +64,7 @@ const publicationDetails = (req, res) => {
 };
 
 const publicationCreateGet = (req, res) => {
-  res.render("publications/create", { title: "Create new publication" });
+  res.render("publications/create", { title: "Create new publication", defaultServer: process.env.DEFAULT_SERVER  });
 };
 
 const publicationCreatePost = (req, res) => {
@@ -77,6 +77,16 @@ const publicationCreatePost = (req, res) => {
       res.status(500).json({ error: "Server error occurred" });
       console.log("Save publication error: ", err);
     });
+};
+
+const pubTestDisplay = (req, res) => {
+  const codeIDtest = req.params.codeIDtest;
+  res.render('wtipiPubs/test'+codeIDtest);
+};
+
+const submitAnswers = (req, res) => {
+  const codeIDtest = req.params.codeIDtest;
+  console.log(codeIDtest)
 };
 
 const publicationDelete = (req, res) => {
@@ -96,5 +106,7 @@ module.exports = {
   publicationCreatePost,
   publicationDelete,
   studentList,
-  createPublication
+  createPublication,
+  pubTestDisplay,
+  submitAnswers
 };

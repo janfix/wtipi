@@ -39,7 +39,7 @@
 
         <!-- Tool Bar -->
         <% if(user){ %>
-          <% if(user._id==group.creator){ %>
+          <% if(user._id.equals(group.creator)){ %>
             <a class="delete actionBT" data-doc="<%= group._id %>">
               <img src="/img/trashcan.svg" title="Remove Assessment" alt="Delete icon" />
             </a>
@@ -58,7 +58,6 @@
       <%- include("../partials/footer.ejs") %>
 
         <script>
-
           document.addEventListener("DOMContentLoaded", function () {
             const endpoint = `/groups/<%= group._id %>/students`;
             fetch(endpoint)
@@ -86,11 +85,24 @@
           trashcan.addEventListener("click", (e) => {
             const endpoint = `/groups/${trashcan.dataset.doc}`;
 
+
             fetch(endpoint, { method: "DELETE" })
-              .then((response) => response.json())
-              .then((data) => (window.location.href = data.redirect))
-              .catch((err) => console.log(err));
+              .then(response => {
+                if (!response.ok) {
+                  throw new Error('Network response was not ok');
+                }
+                return response.json();
+              })
+              .then(data => {
+                window.location.href = data.redirect;
+              })
+              .catch(err => console.log(err));
+
+
+
+
           });
+
         </script>
   </body>
 

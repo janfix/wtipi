@@ -6,6 +6,7 @@ const testRoutes = require("./routes/testRoutes");
 const groupRoutes = require("./routes/groupRoutes");
 const authRoutes = require("./routes/authRoutes");
 const publicationRoutes = require("./routes/publicationRoutes");
+const assessmentRoutes = require("./routes/assessmentRoutes");
 const cookieParser = require("cookie-parser");
 const multer = require("multer");
 const AdmZip = require("adm-zip");
@@ -20,7 +21,7 @@ const csv = require('csv-parser');
 const Group = require("./models/group")
 const User = require("./models/User");
 const Test = require("./models/Test");
-
+const Assessment = require("./models/Assessment");
 
 
 
@@ -33,21 +34,25 @@ app.set("view engine", "ejs");
 
 //app.use(express.static("public"));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/wtipiTests', express.static('wtipiTests'));
+
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 app.use((req, res, next) => {
-  res.locals.currentPage = 'tests'; // Vous pouvez mettre une valeur par défaut ici
+  res.locals.currentPage = 'about'; // Vous pouvez mettre une valeur par défaut ici
   next();
 });
 
 
 // Insérer ici la vérification de l'utilisateur pour toutes les routes
-app.get("*", checkUser);
+app.use(checkUser);
+
 
 app.get("/", (req, res) => {
-  res.redirect("/tests");
+  res.redirect("/about");
 });
 
 app.get("/about", (req, res) => {
@@ -99,6 +104,10 @@ app.post("/uploadcsv", uploadcsv.single("csvfile"), async (req, res) => {
           if (existingUser) {
             // Ajoutez l'ID de l'utilisateur au groupe, s'il n'est pas déjà présent
             const groupUpdate = await Group.findByIdAndUpdate(activGroup, { $addToSet: { students: existingUser._id } }, { new: true });
+            if (!existingUser.group.includes(activGroup)) {
+              existingUser.group.push(activGroup);
+              await existingUser.save();
+            }
           } else {
             // Créez un nouvel utilisateur et ajoutez-le au groupe
             const newUser = new User({
@@ -106,7 +115,8 @@ app.post("/uploadcsv", uploadcsv.single("csvfile"), async (req, res) => {
               lastname: user.lastname,
               email: user.email,
               role: "student",
-              password: user.password, // Assurez-vous que le mot de passe est hashé dans le modèle User
+              password:user.password, 
+              group: [activGroup],
               SID: user.id
             });
             const savedUser = await newUser.save();
@@ -144,13 +154,12 @@ app.post('/upload', upload.single('file'), async (req, res) => {
       const zip = new AdmZip(tempPath);
 
       // Extraction du contenu du ZIP en préservant la structure des répertoires
-      zip.extractAllTo(/*target path*/'public/testing/' + uniq, /*overwrite*/true);
+      zip.extractAllTo(/*target path*/'wtipiTests/' + uniq, /*overwrite*/true);
 
       try {
         // Enregistrement du chemin du fichier dans la base de données
-        testurl = 'testing/' + uniq;
+        testurl = 'wtipiTests/' + uniq;
         const existingTest = await Test.findOne({ uniCode: uniCode });
-        console.log("Test existant:", existingTest);
         if (existingTest) {
           await Test.findOneAndUpdate({ uniCode: uniCode }, { testpath: testurl }, { new: true });
         } else {
@@ -176,6 +185,10 @@ app.use("/tests", (req, res, next) => {
   next();
 },testRoutes);
 
+app.use("/assessments",(req, res, next) => {
+  res.locals.currentPage = 'assessments';
+  next();
+}, assessmentRoutes);
 
 app.use("/blogs",(req, res, next) => {
   res.locals.currentPage = 'blogs';

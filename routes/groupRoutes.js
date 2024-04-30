@@ -2,17 +2,18 @@ const express = require("express");
 const router = express.Router();
 const groupController = require("../controllers/groupControllers");
 const { requireAuth } = require("../middleware/authMiddleware");
+//const { requireAdmin } = require("../middleware/authMiddleware");
 
-router.get("/", groupController.groupList);
+router.get("/",requireAuth(['administrator']), groupController.groupList);
 
-router.post("/", groupController.groupCreatePost);
+router.post("/",requireAuth(['administrator']),  groupController.groupCreatePost);
 
-router.get("/create", requireAuth, groupController.groupCreateGet);
+router.get("/create", requireAuth(['administrator']),  groupController.groupCreateGet);
 
-router.get("/:id",requireAuth, groupController.groupDetails);
+router.get("/:id",requireAuth(['administrator']),  groupController.groupDetails);
 
 router.delete("/:id", groupController.groupDelete);
 
-router.get("/:id/students", requireAuth, groupController.studentList);
+router.get("/:id/students", requireAuth(['administrator']),  groupController.studentList);
 
 module.exports = router;

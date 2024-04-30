@@ -32,12 +32,14 @@
           <input type="date" id="endOn" name="endOn" />
           <label for="pubserver">Choose a server: </label>
           <select name="pubserver" id="pubserver">
-            <option selected="selected" value="http://localhost:3000/publications">Serveur local</option>
+            <option selected="selected" value="<%= defaultServer %>">Default Server</option>
             <option value="DistantServer1" disabled>Distant server 1</option>
             <option value="DistantServer2" disabled>Distant server 2</option>
             <option value="DistantServer3" disabled>Distant server 3</option>
           </select>
           <input type="text" id="unicode" name="unicode"  />
+          
+          <p style="margin-top: 15px;">Todo : -> Results will be available online - accessible in the student home page</p>
 
           <button type="submit">Submit</button>
         </form>
