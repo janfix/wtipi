@@ -114,10 +114,10 @@
             <p>Difficulty : Beginner (Beginner | Expected |difficult)</p>
             <p>Difficulty for linguistics skills : [European :A1..C3]</p>
             <p>Test normalized : Score Brut | Score Echelloné | percentiles | Déciles et quartiles | Ecart Type</p>
-            <p>Group (name) :</p>
+            <p>Group (name) : <%= publication.testGroup[0].groupName %></p>
             <p>Academic Institution name : Lycée Pierre de Fermat</p>
             <p>Group Speciality sector : Ecole Préparatoire Math-Physique </p>
-            <p>Test (name) : </p>
+            <p>Test (name) : <%= publication.testGroup[0].testName %></p>
             <!--  <p>Test id : <%= publication.testGroup[0].groupID %></p> -->
             <p>Status : <span style="color:red" class="blink-two">PROCESSING</span> <!-- <%= publication.status %> -->
             </p>

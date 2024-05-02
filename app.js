@@ -22,7 +22,16 @@ const Group = require("./models/group")
 const User = require("./models/User");
 const Test = require("./models/Test");
 const Assessment = require("./models/Assessment");
+const session = require('express-session');
 
+app.use(session({
+    secret: process.env.SESSION_SECRET, // Utilisez une chaîne secrète pour signer l'ID de session.
+    resave: false, // Ne pas resauvegarder la session si elle n'a pas été modifiée.
+    saveUninitialized: false, // Ne pas sauvegarder une session qui est nouvelle et non modifiée.
+    cookie: {
+      secure: process.env.IS_HTTPS === 'true' // Convertir en booléen
+    } // `true` si vous êtes en HTTPS, false sinon. ICI C'est false car en dev
+}));
 
 
 mongoose

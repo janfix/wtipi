@@ -6,31 +6,56 @@
 
    
    
+    
     <div class="assessments content">
       <h1>Welcome <%= user.firstname %> <%= user.lastname %> to the TIPI platform </h1>
       <p>Below your available assessments. If you don't find your assessment here, call your administrator.</p>
-      You belong to the groups : <%= user.group %>
-      
-      <% if(assessments.length > 0){ %> <% assessments.forEach(assessments => { %>
-      <a class="single" href="/publications/<%= assessments._id %>">
-        <h3 class="title"><%= assessments.title %></h3>
-        <p><%= assessments._id %></p>
-        <p><%= assessments.testGroup[0].testID %></p>
-        <p><%= assessments.testGroup[0].groupID %></p>
-        <p>--</p>
-        <p class="snippet"><%= assessments.snippet %></p>
-      </a>
-      <% }) %> <% } else { %>
-      <p>No assessments to display yet!</p>
+      <!-- You belong to the groups : <%= user.group %> -->
+
+      <% function determineStatus(startOn, endOn) {
+        const now = new Date();
+        const startDate = new Date(startOn);
+        const endDate = new Date(endOn);
+        if (now < startDate) return "Coming Soon";
+        if (now > endDate) return "Passed";
+        return "Available";
+    } %>
+
+    <% function formatDate(dateString) {
+      const date = new Date(dateString);
+      const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+      return new Intl.DateTimeFormat('en-US', options).format(date);
+  }%>
+  
+      <% if (assessments.length > 0) { %>
+          <% const groupedAssessments = { 'Coming Soon': [], 'Available': [], 'Passed': [] }; %>
+          <% assessments.forEach(assessment => {
+              const status = determineStatus(assessment.startOn, assessment.endOn);
+              groupedAssessments[status].push(assessment);
+          }); %>
+  
+          <% for(const status in groupedAssessments) { %>
+              <% if(groupedAssessments[status].length > 0) { %>
+                  <h2 style="margin:10px!important"><%= status %></h2>
+                  <% groupedAssessments[status].forEach(assessment => { %>
+                      <a class="single" href="/publications/<%= assessment._id %>">
+                          <h3 class="title"><%= assessment.title %></h3>
+                          <p class="snippet"><b>START</b>: <%= formatDate(assessment.startOn)%> | <b>END</b>: <%= formatDate(assessment.endOn) %></p>
+                          <p class="snippet"><%= assessment.snippet %></p>
+                          <p class="snippet"><%= assessment.testDetails %></p>    
+                      </a>
+                  <% }); %>
+              <% } %>
+          <% } %>
+      <% } else { %>
+          <p>No assessments to display yet!</p>
       <% } %>
+  </div>
     
-     
-      <h2>Current assessments</h2>
-      <h2>Completed assessments</h2>
-      <p>Here the completed assessments</p>
-    
-    </div>
+   
 
     <%- include('../partials/footer.ejs') %>
+
+
   </body>
 </html>

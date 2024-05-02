@@ -109,15 +109,19 @@
 
 .single{
     display: block;
-    margin: 40px 0;
+    margin: 15px 0;
     padding-left: 30px;
+    padding-top:10px ;
+    padding-bottom:10px ;
     border-left: 6px solid crimson;
+    border-top : 1px dotted gainsboro;
+    box-shadow:  1px 2px 3px rgba(0, 0, 0, 0.2);
 }
 
 
 .single:hover{
     border-left : 6px solid teal;   
-    box-shadow:  1px 2px 3px rgba(0, 0, 0, 0.2);
+    box-shadow:  3px 4px 5px rgba(0, 0, 0, 0.2);
 }
 
  .start {
@@ -312,7 +316,7 @@ box-shadow: 0px 10px 13px -7px #c5d5c5d5, 5px 5px 15px 5px rgba(0,0,0,0);
 }
 
 .filters{
-    display: flex;        /* Active Flexbox pour le conteneur */
+    display: none;        /* Active Flexbox pour le conteneur */
     justify-content: left; /* Centre les éléments horizontalement */
     align-items: center;  /* Optionnel: aligne les éléments verticalement au centre */
 

@@ -48,6 +48,8 @@ const loginPost = async (req, res) => {
   try {
     const user = await User.login(email, password);
     const token = createToken(user._id);
+     // Sauvegarder l'identifiant de l'utilisateur dans la session
+    req.session.userId = user._id;
     res.cookie("jwt", token, { httpOnly: true, maxAge: maxAge * 1000 });
     res.status(200).json({ user: user._id, role: user.role, lastname : user.lastname, firstname : user.firstname, groups : user.group });
   } catch (error) {
@@ -66,6 +68,7 @@ const registerPost = async (req, res) => {
   try {
     const user = await User.create({firstname, lastname, role, email, password });
     const token = createToken(user._id);
+    req.session.userId = user._id;
     res.cookie("jwt", token, { httpOnly: true, maxAge: maxAge * 1000 });
     res.status(201).json({ user: user._id });
   } catch (err) {
@@ -76,7 +79,9 @@ const registerPost = async (req, res) => {
 
 const logoutGet = (req, res) => {
   res.cookie("jwt", "", { maxAge: 1 });
-  res.redirect("/");
+  req.session.destroy(() => { // Détruire la session
+    res.redirect("/");
+  });
 };
 
 module.exports = {

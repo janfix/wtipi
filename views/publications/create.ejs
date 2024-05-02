@@ -7,7 +7,7 @@
 
       <div class="create-publication content">
         <h1 class="centeredTitle">Create a new publication</h1>
-        <form  enctype="multipart/form-data">
+        <form enctype="multipart/form-data">
           <div id="user-data" data-id="<%= user.id %>" data-email="<%= user.email %>">
             Your publication will be saved based on your ID that associated with your
             email <%= user.email %>.
@@ -37,9 +37,10 @@
             <option value="DistantServer2" disabled>Distant server 2</option>
             <option value="DistantServer3" disabled>Distant server 3</option>
           </select>
-          <input type="text" id="unicode" name="unicode"  />
-          
-          <p style="margin-top: 15px;">Todo : -> Results will be available online - accessible in the student home page</p>
+          <input type="text" id="unicode" name="unicode" />
+
+          <p style="margin-top: 15px;">Todo : -> Results will be available online - accessible in the student home page
+          </p>
 
           <button type="submit">Submit</button>
         </form>
@@ -62,7 +63,7 @@
         document.addEventListener("DOMContentLoaded", function () {
           fetchTests();
           fetchGroups();
-          
+
         });
 
         function fetchTests() {
@@ -75,9 +76,10 @@
                 console.log(test)
                 option.value = test._id; // _MongoID'
                 option.textContent = test.title; // Assuming each test has a 'name'
+                option.setAttribute("data-testName", test.title);
                 select.appendChild(option);
                 testUnicode = test.uniCode;
-                
+
               });
             })
             .catch(error => console.error('Error fetching tests:', error));
@@ -93,6 +95,7 @@
                 option.setAttribute('data-sid', group.students);
                 option.value = group._id; // _MongoID
                 option.textContent = group.groupName; // Assuming each group has a 'name'
+                option.setAttribute("data-groupName", group.groupName);
                 select.appendChild(option);
               });
             })
@@ -130,10 +133,21 @@
           const title = form.title.value;
           const snippet = form.snippet.value;
           const body = form.body.value;
-          const testGroup = { testID: form.testIDs.value, groupID: form.groupIDs.value };
-          // Correction: Retrieve data-sid from the selected option in the groupIDs select
-          const selectedGroupOption = form.groupIDs.options[form.groupIDs.selectedIndex];
-          const students = selectedGroupOption.getAttribute("data-sid").split(',');
+          const dataTestName = $()
+          const testGroup = { testID: form.testIDs.value, testName: form.testIDs.getAttribute("data-testname"), groupID: form.groupIDs.value, groupName: form.groupIDs.getAttribute("data-groupname") };
+
+          const testSelect = document.getElementById('testIDs');
+          const groupSelect = document.getElementById('groupIDs');
+
+          const selectedTestOption = testSelect.options[testSelect.selectedIndex];
+          const selectedGroupOption = groupSelect.options[groupSelect.selectedIndex];
+
+          const testID = selectedTestOption.value;
+          const testName = selectedTestOption.getAttribute("data-testName");
+          const groupID = selectedGroupOption.value;
+          const groupName = selectedGroupOption.getAttribute("data-groupName");
+          const students = selectedGroupOption.getAttribute('data-sid').split(',');
+
 
 
           const startOn = form.startOn.value;
@@ -155,14 +169,19 @@
             creator,
             snippet,
             body,
-            testGroup,
+            testGroup: {
+              testID: testID,
+              testName: testName,
+              groupID: groupID,
+              groupName: groupName
+            },
             students,
             status,
             startOn,
             endOn,
             server,
             testurl,
-            testUnicode 
+            testUnicode
           };
 
           try {
@@ -172,8 +191,9 @@
               headers: { "content-Type": "application/json" },
             }).then((result) => {
               if (result) {
-                console.log(result)
                 location.assign("/publications");
+              } else {
+                throw new Error('Failed to create publication');
               }
             });
           } catch (error) {
