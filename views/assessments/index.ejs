@@ -38,7 +38,7 @@
               <% if(groupedAssessments[status].length > 0) { %>
                   <h2 style="margin:10px!important"><%= status %></h2>
                   <% groupedAssessments[status].forEach(assessment => { %>
-                      <a class="single" href="/publications/<%= assessment._id %>">
+                      <a class="single" href="/wtipiPubs/test<%= assessment.testurl %>">
                           <h3 class="title"><%= assessment.title %></h3>
                           <p class="snippet"><b>START</b>: <%= formatDate(assessment.startOn)%> | <b>END</b>: <%= formatDate(assessment.endOn) %></p>
                           <p class="snippet"><%= assessment.snippet %></p>
@@ -55,7 +55,6 @@
    
 
     <%- include('../partials/footer.ejs') %>
-
 
   </body>
 </html>

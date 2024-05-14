@@ -23,32 +23,112 @@ const User = require("./models/User");
 const Test = require("./models/Test");
 const Assessment = require("./models/Assessment");
 const session = require('express-session');
+/* const bodyParser = require('body-parser'); */
 
 app.use(session({
-    secret: process.env.SESSION_SECRET, // Utilisez une chaîne secrète pour signer l'ID de session.
-    resave: false, // Ne pas resauvegarder la session si elle n'a pas été modifiée.
-    saveUninitialized: false, // Ne pas sauvegarder une session qui est nouvelle et non modifiée.
-    cookie: {
-      secure: process.env.IS_HTTPS === 'true' // Convertir en booléen
-    } // `true` si vous êtes en HTTPS, false sinon. ICI C'est false car en dev
+  secret: process.env.SESSION_SECRET, // Utilisez une chaîne secrète pour signer l'ID de session.
+  resave: false, // Ne pas resauvegarder la session si elle n'a pas été modifiée.
+  saveUninitialized: false, // Ne pas sauvegarder une session qui est nouvelle et non modifiée.
+  cookie: {
+    secure: process.env.IS_HTTPS === 'true' // Convertir en booléen
+  } // `true` si vous êtes en HTTPS, false sinon. ICI C'est false car en dev
 }));
 
+app.use(cookieParser());
+
+
+/* app.use(bodyParser.urlencoded({ limit: '50mb', extended: true })); */
 
 mongoose
   .connect(dbURI)
   .then((result) => app.listen(3000))
   .catch((err) => console.log(err));
 
+
 app.set("view engine", "ejs");
+
+
+
+
+const requireStudentInPublication = async (req, res, next) => {
+  console.log("REQUIRESTUDENTINPUBLICATION??????")
+  const userId = req.userId; // ID de l'utilisateur extrait du JWT par un autre middleware
+  const publicationId = req.params.publicationId; // Assurez-vous que l'ID de la publication est passé correctement
+
+  try {
+    const publication = await Publication.findById(publicationId);
+    if (!publication) {
+      return res.status(404).send("Publication not found.");
+    }
+
+    if (publication.students.includes(userId)) {
+      next();
+    } else {
+      res.status(403).send("Access denied. You are not listed in this publication.");
+    }
+  } catch (error) {
+    console.error("Error checking student in publication:", error);
+    res.status(500).send("Internal server error");
+  }
+};
+
 
 //app.use(express.static("public"));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/wtipiTests', express.static('wtipiTests'));
 
+// Middleware pour authentifier l'accès à wtipiPubs
+app.all('/wtipiPubs/*', function (req, res, next) {
+  console.log(req.session.loggedIn)
+  console.log(req.originalUrl)
+  console.log(req.session.authTest)
+  console.log(req.session.authTest.length)
+  /* if(req.session.authTest){
+ res.redirect("/login");
+ return
+  } */
+  // Construction de l'URL attendue
+  const expectedUrl = `/wtipiPubs/test${req.session.authTest}/`;
+  //console.log("BOOOM", req.session.authTest);
+  console.log(req.originalUrl.startsWith(expectedUrl[0]))
+
+try {
+
+if(req.session.authTest.length >0){
+  console.log("PASSE LE TEST DE LONGUEUR")
+} else{
+  console.log("ECHEC AU TEST DE LONGUEUR MAIS SANS BUG")
+  res.redirect("/login");
+  return
+}
+  // Vérification si l'utilisateur est connecté et accède à l'URL attendue
+  if (req.session.loggedIn && req.originalUrl.startsWith(expectedUrl[0])) {
+    next(); // L'utilisateur est autorisé, continue vers la route suivante
+  } else {
+    console.log("REDIRECTION VERS LOGIN")
+    // Sinon, rediriger vers la page de connexion
+    res.redirect("/login");
+  }
+
+  
+} catch (error) {
+  console.log(error)
+  
+}
+
+  
+
+
+});
+
+
+app.use('/wtipiPubs', express.static(path.join(__dirname, 'wtipiPubs')));
+
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
+
 
 app.use((req, res, next) => {
   res.locals.currentPage = 'about'; // Vous pouvez mettre une valeur par défaut ici
@@ -58,6 +138,7 @@ app.use((req, res, next) => {
 
 // Insérer ici la vérification de l'utilisateur pour toutes les routes
 app.use(checkUser);
+
 
 
 app.get("/", (req, res) => {
@@ -124,7 +205,7 @@ app.post("/uploadcsv", uploadcsv.single("csvfile"), async (req, res) => {
               lastname: user.lastname,
               email: user.email,
               role: "student",
-              password:user.password, 
+              password: user.password,
               group: [activGroup],
               SID: user.id
             });
@@ -192,24 +273,24 @@ app.post('/upload', upload.single('file'), async (req, res) => {
 app.use("/tests", (req, res, next) => {
   res.locals.currentPage = 'tests'; // `res.locals` rend la variable disponible dans toutes les vues
   next();
-},testRoutes);
+}, testRoutes);
 
-app.use("/assessments",(req, res, next) => {
+app.use("/assessments", (req, res, next) => {
   res.locals.currentPage = 'assessments';
   next();
 }, assessmentRoutes);
 
-app.use("/blogs",(req, res, next) => {
+app.use("/blogs", (req, res, next) => {
   res.locals.currentPage = 'blogs';
   next();
 }, blogRoutes);
 
-app.use("/groups",(req, res, next) => {
+app.use("/groups", (req, res, next) => {
   res.locals.currentPage = 'groups';
   next();
 }, groupRoutes);
 
-app.use("/publications",(req, res, next) => {
+app.use("/publications", (req, res, next) => {
   res.locals.currentPage = 'publications';
   next();
 }, publicationRoutes);

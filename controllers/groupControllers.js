@@ -13,16 +13,31 @@ const groupList = (req, res) => {
 
 const studentList = async  (req, res) => {
   const groupId = req.params.id;  // L'ID de la group est obtenu à partir des paramètres de la requête.
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 100; // Définit un nombre d'étudiants par page
+  const skip = (page - 1) * limit;  // Calcule le nombre d'étudiants à sauter
+
   try {
     const group = await Group.findById(groupId);
     if (!group) {
-      return res.status(404).json({ error: "group not found" });
+      return res.status(404).json({ error: "Group not found" });
     }
-    const students = await User.find({
-      '_id': { $in: group.students }
-    }).select('SID lastname firstname email  -_id');  // Select specific fields and exclude _id
 
-    res.json(students);  // Send the students as a JSON response
+    // Récupère les étudiants avec la pagination
+    const students = await User.find({ '_id': { $in: group.students } })
+                               .select('SID lastname firstname email -_id')
+                               .skip(skip)
+                               .limit(limit);
+
+    // Compte le nombre total d'étudiants dans le groupe
+    const total = await User.countDocuments({ '_id': { $in: group.students } });
+
+    res.json({
+      total,
+      page,
+      pages: Math.ceil(total / limit),
+      students
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error occurred" });

@@ -64,26 +64,6 @@ const checkUser = (req, res, next) => {
   }
 };
 
-const requireStudentInPublication = async (req, res, next) => {
-  const userId = req.userId; // ID de l'utilisateur extrait du JWT par un autre middleware
-  const publicationId = req.params.publicationId; // Assurez-vous que l'ID de la publication est passé correctement
-
-  try {
-    const publication = await Publication.findById(publicationId);
-    if (!publication) {
-      return res.status(404).send("Publication not found.");
-    }
-
-    if (publication.students.includes(userId)) {
-      next();
-    } else {
-      res.status(403).send("Access denied. You are not listed in this publication.");
-    }
-  } catch (error) {
-    console.error("Error checking student in publication:", error);
-    res.status(500).send("Internal server error");
-  }
-};
 
 
 module.exports = { requireAuth, requireAdmin, checkUser };

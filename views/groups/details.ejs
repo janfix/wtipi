@@ -1,109 +1,113 @@
 <html lang="en">
 <%- include("../partials/head.ejs") %>
 
-  <body>
+<body>
     <%- include("../partials/nav.ejs") %>
 
-      <div class="details content">
-        <h1>Group : <%= group.groupName %> - Details</h1>
+    <div class="details content">
+        <h1>Group: <%= group.groupName %> - Details</h1>
         <div class="content">
-          <p>
-            <%= group.description %>
-          </p>
-          <p>
-            <%= group.createdAt %>
-          </p>
-
-          <p>
-            <%= group.body %>
-          </p>
+            <p><%= group.description %></p>
+            <p><%= group.createdAt %></p>
+            <p><%= group.body %></p>
         </div>
         <div id="studentsList">
-          <h2 style="color :teal; margin-top: 20px; margin-bottom: 0px; ">Students in Publication (<span
-              id="studentCount">0</span>)</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>Email</th>
-                <th>SID</th>
-              </tr>
-            </thead>
-            <tbody>
-              <!-- Les étudiants seront ajoutés ici par JavaScript -->
-            </tbody>
-          </table>
+            <h2 style="color: teal; margin-top: 20px; margin-bottom: 0px;">Students in Publication (<span id="studentCount">0</span>)</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Email</th>
+                        <th>SID</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Les étudiants seront ajoutés ici par JavaScript -->
+                </tbody>
+            </table>
         </div>
-
 
         <!-- Tool Bar -->
         <% if(user){ %>
-          <% if(user._id.equals(group.creator)){ %>
-            <a class="delete actionBT" data-doc="<%= group._id %>">
-              <img src="/img/trashcan.svg" title="Remove Assessment" alt="Delete icon" />
-            </a>
-            <a class="edit actionBT" data-doc="<%= group._id %>">
-              <img width="25px" src="/img/btEdit.png" title="Edit test information" alt="Edit Test info" />
-            </a>
-            <a class="start actionBT" data-doc="<%= group._id %>">
-              <img width="25px" src="/img/btStart.png" title="Start test" alt="Start Test" />
-            </a>
-            <% }else{%>
-              <div class="delete">Impossible</div>
-              <%}%> %> <% } %>
+            <% if(user._id.equals(group.creator)){ %>
+                <a class="delete actionBT" data-doc="<%= group._id %>">
+                    <img src="/img/trashcan.svg" title="Remove Assessment" alt="Delete icon" />
+                </a>
+                <a class="edit actionBT" data-doc="<%= group._id %>">
+                    <img width="25px" src="/img/btEdit.png" title="Edit test information" alt="Edit Test info" />
+                </a>
+                <a class="start actionBT" data-doc="<%= group._id %>">
+                    <img width="25px" src="/img/btStart.png" title="Start test" alt="Start Test" />
+                </a>
+            <% } else { %>
+                <div class="delete">Impossible</div>
+            <% } %>
+        <% } %>
+    </div>
 
-      </div>
+    <div id="paginationControls">
+        <button id="prevPage">Previous</button>
+        <button id="nextPage">Next</button>
+    </div>
 
-      <%- include("../partials/footer.ejs") %>
+    <%- include("../partials/footer.ejs") %>
 
-        <script>
-          document.addEventListener("DOMContentLoaded", function () {
-            const endpoint = `/groups/<%= group._id %>/students`;
+    <script>
+        let currentPage = 1; // Initial page
+        const studentsTable = document.querySelector("#studentsList tbody");
+        const studentCountSpan = document.querySelector("#studentCount");
+
+        function loadStudents(page) {
+            const endpoint = `/groups/<%= group._id %>/students?page=${page}`;
             fetch(endpoint)
-              .then(response => response.json())
-              .then(data => {
-                const tbody = document.querySelector("#studentsList tbody");
-                const studentCountSpan = document.querySelector("#studentCount");
-                studentCountSpan.textContent = data.length; // Met à jour le nombre d'étudiants
-                data.forEach(student => {
-                  tbody.innerHTML += `
-                <tr>
-                  <td>${student.firstname}</td>
-                  <td>${student.lastname}</td>
-                  <td>${student.email}</td>
-                  <td>${student.SID}</td>
-                </tr>`;
-                });
-              })
-              .catch(err => console.error('Error loading students:', err));
-          });
+                .then(response => response.json())
+                .then(data => {
+                    studentsTable.innerHTML = ''; // Clear previous rows
+                    studentCountSpan.textContent = data.total;
+                    data.students.forEach(student => {
+                        studentsTable.innerHTML += `
+                            <tr>
+                                <td>${student.firstname}</td>
+                                <td>${student.lastname}</td>
+                                <td>${student.email}</td>
+                                <td>${student.SID}</td>
+                            </tr>`;
+                    });
+                })
+                .catch(err => console.error('Error loading students:', err));
+        }
 
+        document.addEventListener("DOMContentLoaded", () => {
+            loadStudents(currentPage); // Load initial page of students
+        });
 
+        document.getElementById('nextPage').addEventListener('click', () => {
+            currentPage++;
+            loadStudents(currentPage);
+        });
 
-          const trashcan = document.querySelector("a.delete");
-          trashcan.addEventListener("click", (e) => {
+        document.getElementById('prevPage').addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                loadStudents(currentPage);
+            }
+        });
+
+        const trashcan = document.querySelector("a.delete");
+        trashcan.addEventListener("click", (e) => {
             const endpoint = `/groups/${trashcan.dataset.doc}`;
-
-
             fetch(endpoint, { method: "DELETE" })
-              .then(response => {
-                if (!response.ok) {
-                  throw new Error('Network response was not ok');
-                }
-                return response.json();
-              })
-              .then(data => {
-                window.location.href = data.redirect;
-              })
-              .catch(err => console.log(err));
-
-
-
-
-          });
-
-        </script>
-  </body>
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.json();
+                })
+                .then(data => {
+                    window.location.href = data.redirect;
+                })
+                .catch(err => console.log(err));
+        });
+    </script>
+</body>
 
 </html>

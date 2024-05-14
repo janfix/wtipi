@@ -73,7 +73,7 @@
               const select = document.getElementById('testIDs');
               tests.forEach(test => {
                 const option = document.createElement('option');
-                console.log(test)
+                //console.log(test)
                 option.value = test._id; // _MongoID'
                 option.textContent = test.title; // Assuming each test has a 'name'
                 option.setAttribute("data-testName", test.title);
@@ -172,6 +172,7 @@
             testGroup: {
               testID: testID,
               testName: testName,
+              testUnicode : testUnicode,
               groupID: groupID,
               groupName: groupName
             },
@@ -208,7 +209,7 @@
               headers: { "content-Type": "application/json" },
             }).then((result) => {
               if (result) {
-                console.log(result)
+                //console.log(result)
                 location.assign("/publications");
               }
             });
@@ -230,7 +231,7 @@
 
         // Appel de la fonction et affichage du code unique dans la console
         const uniqueCode = generateUniqueCode();
-        console.log(uniqueCode);
+       //console.log(uniqueCode);
 
       </script>
 

@@ -50,6 +50,9 @@ const loginPost = async (req, res) => {
     const token = createToken(user._id);
      // Sauvegarder l'identifiant de l'utilisateur dans la session
     req.session.userId = user._id;
+    req.session.loggedIn = true;
+    req.session.authPub = user.publication;
+    req.session.authTest = user.tests;
     res.cookie("jwt", token, { httpOnly: true, maxAge: maxAge * 1000 });
     res.status(200).json({ user: user._id, role: user.role, lastname : user.lastname, firstname : user.firstname, groups : user.group });
   } catch (error) {

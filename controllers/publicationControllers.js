@@ -14,6 +14,7 @@ const publicationList = (req, res) => {
 const createPublication = async (req, res) => {
   console.log("CALL CREATEPUBLICATION")
   const testID = req.body.testUnicode; // ID du test choisi dans le formulaire
+  //const groupTarget = req.body.testGroup[0].groupId; 
   const unicode = req.body.testurl; // Code unicode généré pour le répertoire
 
   // Chemin du répertoire source
@@ -67,16 +68,30 @@ const publicationCreateGet = (req, res) => {
   res.render("publications/create", { title: "Create new publication", defaultServer: process.env.DEFAULT_SERVER  });
 };
 
-const publicationCreatePost = (req, res) => {
-  const publication = new Publication(req.body);
+const publicationCreatePost = async (req, res) => {
+ 
+  const savedPublication = new Publication(req.body);
+  const groupTarget = req.body.testGroup.groupID;
+  const testInPub = req.body.testurl;
+  console.log(testInPub) 
 
-  publication
+  savedPublication
     .save()
-    .then((result) => res.redirect("/publications"))
     .catch((err) => {
       res.status(500).json({ error: "Server error occurred" });
       console.log("Save publication error: ", err);
     });
+
+    // Mise à jour des étudiants du groupe cible
+    const updatedStudents = await User.updateMany(
+      { group: { $in: [groupTarget] }, role: 'student' },
+      { $push: { publication: savedPublication._id, tests: testInPub } },
+        
+    );
+
+    res.redirect("/publications");
+
+    
 };
 
 const pubTestDisplay = (req, res) => {
@@ -86,7 +101,7 @@ const pubTestDisplay = (req, res) => {
 
 const submitAnswers = (req, res) => {
   const codeIDtest = req.params.codeIDtest;
-  console.log(codeIDtest)
+  //console.log(codeIDtest)
 };
 
 const publicationDelete = (req, res) => {
