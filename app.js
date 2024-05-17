@@ -7,6 +7,7 @@ const groupRoutes = require("./routes/groupRoutes");
 const authRoutes = require("./routes/authRoutes");
 const publicationRoutes = require("./routes/publicationRoutes");
 const assessmentRoutes = require("./routes/assessmentRoutes");
+const resultRoutes = require('./routes/resultsRoute');
 const cookieParser = require("cookie-parser");
 const multer = require("multer");
 const AdmZip = require("adm-zip");
@@ -21,9 +22,12 @@ const csv = require('csv-parser');
 const Group = require("./models/group")
 const User = require("./models/User");
 const Test = require("./models/Test");
-const Assessment = require("./models/Assessment");
+const Publication = require("./models/Publication");
 const session = require('express-session');
-/* const bodyParser = require('body-parser'); */
+const bodyParser = require('body-parser');
+const { createObjectCsvWriter } = require('csv-writer');
+const xml2js = require('xml2js');
+
 
 app.use(session({
   secret: process.env.SESSION_SECRET, // Utilisez une chaîne secrète pour signer l'ID de session.
@@ -36,6 +40,8 @@ app.use(session({
 
 app.use(cookieParser());
 
+// Middleware pour parser le corps des requêtes en texte brut (pour l'XML)
+app.use(bodyParser.text({ type: 'application/xml' }));
 
 /* app.use(bodyParser.urlencoded({ limit: '50mb', extended: true })); */
 
@@ -79,10 +85,10 @@ app.use('/wtipiTests', express.static('wtipiTests'));
 
 // Middleware pour authentifier l'accès à wtipiPubs
 app.all('/wtipiPubs/*', function (req, res, next) {
-  console.log(req.session.loggedIn)
-  console.log(req.originalUrl)
-  console.log(req.session.authTest)
-  console.log(req.session.authTest.length)
+  //console.log(req.session.loggedIn)
+  //console.log(req.originalUrl)
+  //console.log(req.session.authTest)
+  //console.log(req.session.authTest.length)
   /* if(req.session.authTest){
  res.redirect("/login");
  return
@@ -92,31 +98,31 @@ app.all('/wtipiPubs/*', function (req, res, next) {
   //console.log("BOOOM", req.session.authTest);
   console.log(req.originalUrl.startsWith(expectedUrl[0]))
 
-try {
+  try {
 
-if(req.session.authTest.length >0){
-  console.log("PASSE LE TEST DE LONGUEUR")
-} else{
-  console.log("ECHEC AU TEST DE LONGUEUR MAIS SANS BUG")
-  res.redirect("/login");
-  return
-}
-  // Vérification si l'utilisateur est connecté et accède à l'URL attendue
-  if (req.session.loggedIn && req.originalUrl.startsWith(expectedUrl[0])) {
-    next(); // L'utilisateur est autorisé, continue vers la route suivante
-  } else {
-    console.log("REDIRECTION VERS LOGIN")
-    // Sinon, rediriger vers la page de connexion
-    res.redirect("/login");
+    if (req.session.authTest.length > 0) {
+      console.log("PASSE LE TEST DE LONGUEUR")
+    } else {
+      console.log("ECHEC AU TEST DE LONGUEUR MAIS SANS BUG")
+      res.redirect("/login");
+      return
+    }
+    // Vérification si l'utilisateur est connecté et accède à l'URL attendue
+    if (req.session.loggedIn && req.originalUrl.startsWith(expectedUrl[0])) {
+      next(); // L'utilisateur est autorisé, continue vers la route suivante
+    } else {
+      console.log("REDIRECTION VERS LOGIN")
+      // Sinon, rediriger vers la page de connexion
+      res.redirect("/login");
+    }
+
+
+  } catch (error) {
+    console.log(error)
+
   }
 
-  
-} catch (error) {
-  console.log(error)
-  
-}
 
-  
 
 
 });
@@ -169,11 +175,6 @@ app.get('/api/groups', async (req, res) => {
     res.status(500).send("Failed to get groups");
   }
 });
-
-//Reach Test Preview
-
-
-
 
 
 //Route pour télécharger le CSV
@@ -235,7 +236,7 @@ app.post('/upload', upload.single('file'), async (req, res) => {
   } else {
     const uniCode = req.body.IDcode;
     const uniq = "test" + uniCode;
-    console.log(uniCode)
+    //console.log(uniCode)
     try {
       // Chemin où le fichier ZIP téléchargé est temporairement stocké
       const tempPath = req.file.path;
@@ -269,6 +270,75 @@ app.post('/upload', upload.single('file'), async (req, res) => {
     }
   }
 });
+
+//Results treatment *******************************
+
+// Routes
+app.use('/', resultRoutes);
+
+// Middleware pour parser le corps des requêtes en texte brut (pour l'XML)
+/* app.use(bodyParser.text({ type: 'application/xml' }));
+
+const csvWriter = createObjectCsvWriter({
+  path: 'data.csv',
+  append: true,
+  header: [
+    { id: 'timeStamp', title: 'TimeStamp'},
+    { id: 'userID', title: 'User ID' },
+    { id: 'publicationID', title: 'Publication ID' },
+    { id: 'identifier', title: 'IDENTIFIER' },
+    { id: 'value', title: 'VALUE' },
+    { id: 'outcome', title: 'OUTCOME' }
+  ]
+});
+
+function extractTestIdFromURL(url) {
+  const regex = /\/test(\d+)\//;
+  const match = url.match(regex);
+  if (match && match[1]) {
+    const testCode = match[1];
+    //console.log('Test Code:', testCode); // Affiche "1320231330131313"
+    return testCode;
+  }
+}
+
+app.post('/process_results', async (req, res) => {
+  //console.log(req)
+  const userId = req.session.userId;
+  const currentTest = extractTestIdFromURL(req.headers.referer);
+  //console.log(currentTest)
+  const currentPublication = await Publication.findOne({testurl: currentTest});
+  //console.log(currentPublication)
+  
+
+  xml2js.parseString(req.body, (err, result) => {
+    if (err) {
+      return res.status(500).send('Error parsing XML');
+    }
+
+    // Correction ici pour accéder correctement à itemResult
+    const itemResults = result.assessmentResult.itemResult.map(item => {
+      return {
+        timeStamp : Date.now(),
+        userID: userId,
+        publicationID: currentPublication._id,
+        identifier: item.$.identifier,
+        value: item.responseVariable[0].candidateResponse[0].value[0],
+        outcome: item.outcomeVariable ? item.outcomeVariable[0].value[0] : '0' // Vérifiez si outcomeVariable existe
+      };
+    });
+
+    csvWriter.writeRecords(itemResults)
+      .then(() => {
+        res.send('Data written to CSV successfully');
+      })
+      .catch(error => {
+        res.status(500).send('Failed to write to CSV');
+      });
+  });
+}); */
+
+/* --00-- */
 
 app.use("/tests", (req, res, next) => {
   res.locals.currentPage = 'tests'; // `res.locals` rend la variable disponible dans toutes les vues
