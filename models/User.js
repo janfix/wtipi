@@ -35,9 +35,35 @@ const userSchema = new Schema({
   tests:{
     type : Array
   },
+  testAuth: {
+    type: [String], // Liste des tests autorisés
+    default: [],
+  },
   publication:{
     type : Array
+  },
+  school : {
+    type : String
+  },
+  class:{
+    type : String
+  },
+  grade : {
+    type : String
+  }, 
+  sector : {
+    type : String
+  }, 
+  town : {
+    type : String
+  }, 
+  zipcode : {
+    type : String
+  }, 
+  mailStatus : {
+    type : String
   }
+
 });
 
 // Middleware pour hasher le mot de passe uniquement s'il est modifié

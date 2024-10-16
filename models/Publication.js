@@ -1,6 +1,10 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
+const sanitizeFileName = (fileName) => {
+  return fileName.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+};
+
 const publicationschema = new Schema(
   {
     title: {
@@ -8,6 +12,10 @@ const publicationschema = new Schema(
       required: true,
     },
     creator: {
+      type: String,
+      required: true,
+    },
+    creatorName: {
       type: String,
       required: true,
     },
@@ -19,63 +27,75 @@ const publicationschema = new Schema(
       type: String,
       required: true,
     },
-    testName : {
-       type: String,
-    },
-    groupName:{
+    testName: {
       type: String,
     },
-    academicInstitutionName:{
-       type: String,
+    groupName: {
+      type: String,
     },
-    groupSector:{
-      type : String,
+    academicInstitutionName: {
+      type: String,
     },
-    level:{
-      type : Number,
+    groupSector: {
+      type: String,
     },
-    sessionLimit:{
-      type : Number
+    level: {
+      type: Number,
     },
-    linguistic : {
+    sessionLimit: {
+      type: Number,
+    },
+    linguistic: {
       type: Boolean,
     },
-    EuropFramework : {
-      type : String,
+    EuropFramework: {
+      type: String,
     },
-    testGroup: { //{testId : 121121, groupId : 454545}
+    testGroup: {
+      // {testId : 121121, groupId : 454545}
       type: Array,
-      required: true
+      required: true,
     },
-    subject:{
-       type : String,
+    subject: {
+      type: String,
     },
-    duration:{
-        type : String,
+    duration: {
+      type: String,
     },
-    students : {
-      type: Array,
-      required : true
-    },
+    students: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Student', // Assurez-vous de référencer le bon modèle
+      required: true,
+    }],
     status: {
-      type: Boolean //available or not
+      type: Boolean, // available or not
     },
     startOn: {
-      type: Date
+      type: Date,
     },
     endOn: {
-      type: Date
+      type: Date,
     },
     server: {
       type: String,
-      default: "http://localhost:3000/publications/"
+      default: "http://localhost:3000/publications/",
     },
     testurl: {
-      type: String
-    }
+      type: String,
+    },
+    csvName: {
+      type: String,
+    },
   },
   { timestamps: true }
 );
+
+publicationschema.pre('save', function(next) {
+  if (this.isNew || this.isModified('title')) {
+    this.csvName = sanitizeFileName(this.title) + '_' + this._id;
+  }
+  next();
+});
 
 const Publication = mongoose.model("Publication", publicationschema);
 module.exports = Publication;

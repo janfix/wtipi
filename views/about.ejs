@@ -5,13 +5,51 @@
     <%- include('./partials/nav.ejs') %>
 
     <div class="about content">
-      <h2>About WTest-Platform or WTP</h2>
+      <h1>About WTest-Platform (WTP)</h1>
       <div>
-        <p>WTP is a new kind of assessment platform.</p>
         <br>
-        <p>Parameters : 
-         
-        </p>
+        <h2>WTP is a new kind of assessment platform</h2>
+        <p>The principle is simple, the aim of this platform is to publish tests whatever technology is used. It presents all tests as a static website under security access.</p> 
+        <p>Whatever if the test is based on QTI1, QTI2, QTI2.1, QTI2.2, QTI3, or anykind of code you use, upload it on WTP.</p>
+        <br>
+        <h2>Workflow</h2>
+        <p>This define the workflow :</p>
+        <ul class="aboutUl">
+          <li>Create your items and tests in your own environment as usual, export the test as a package.</li>
+          <li>Import the zip package in WTP, the platform will integrate them in a static structure</li>
+          <li>Import your target group of students using a CSV including their credentials (for the moment, coming : LDAP,activeDirectory)</li>
+          <li>Create a publication that link the chosen test and the target group.</li>
+          <li>Send a mail to your student saying go to this platform URL, identify yourself with your login and password</li>
+          <li>The students pass the test and generate their results</li>
+          <li>Follow the progression of the assessment on the platform</li>
+          <li>You will receive a mail when the test-time is over or all students have passed the test</li>
+          <li>Download the results</li>
+          <br>
+        </ul> 
+        <h2>Versatility</h2>
+        <ul class="aboutUl">
+          <li>High stakes Exams</li>
+          <li>Classic digital Assessments</li>
+          <li>Pools</li>
+          <li>Live Session (todo)</li>
+        </ul>
+        <br>
+
+        <h2>Additionnal treatment modules (todo)</h2> 
+        <p>The flexibility of the platform makes it easy to add some modules for automatic treatments of the data : </p>
+        <ul class="aboutUl">
+          <li>Automatic report</li>
+          <li>Automatic feedback report for students</li>
+          <li>Automatic test analysis</li>
+          <li>Passing results to human correction</li>
+          <li>Passing results to AI correction</li>
+        </ul>
+        <br>
+        <h2>Some other notes</h2>
+        <p>This project is developped by Jean-Philippe Rivière from Wiquid. </p>
+        <p>It is based on nodejs server, no framework, it is fast and solid.</p>
+        <p>It will be open source + fully free version for public schools</p>
+        <p>If you want to join the adventure : jean.philippe.riviere@gmail.com, https://github.com/janfix</p>
       </div>
     </div>
 

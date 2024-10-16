@@ -1,6 +1,20 @@
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
+const path = require("path");
+const cookieParser = require("cookie-parser");
+const session = require('express-session');
+const bodyParser = require('body-parser');
+const multer = require("multer");
+const fs = require("fs");
+const fsExtra = require("fs-extra"); 
+const csv = require("csv-parser"); 
+const { checkUser, requireAuth, requireAdmin,  requireAuthInPublication,requireAuthForStaticFiles } = require("./middleware/authMiddleware");
+const User = require("./models/User");
+const Test = require("./models/Test");
+const Group = require("./models/group");
+const jwt = require("jsonwebtoken");
+const AdmZip = require("adm-zip");
 const blogRoutes = require("./routes/blogRoutes");
 const testRoutes = require("./routes/testRoutes");
 const groupRoutes = require("./routes/groupRoutes");
@@ -8,176 +22,105 @@ const authRoutes = require("./routes/authRoutes");
 const publicationRoutes = require("./routes/publicationRoutes");
 const assessmentRoutes = require("./routes/assessmentRoutes");
 const resultRoutes = require('./routes/resultsRoute');
-const cookieParser = require("cookie-parser");
-const multer = require("multer");
-const AdmZip = require("adm-zip");
-const fs = require("fs");
-const path = require("path");
-const { checkUser } = require("./middleware/authMiddleware");
+const parameterRoutes = require('./routes/parameterRoutes');
+
+
+
+
+
 const app = express();
-const upload = multer({ dest: 'upload/' });
-const uploadcsv = multer({ dest: 'uploadcsv/' });
-const dbURI = process.env.DB_URI;
-const csv = require('csv-parser');
-const Group = require("./models/group")
-const User = require("./models/User");
-const Test = require("./models/Test");
-const Publication = require("./models/Publication");
-const session = require('express-session');
-const bodyParser = require('body-parser');
-const { createObjectCsvWriter } = require('csv-writer');
-const xml2js = require('xml2js');
 
-
-app.use(session({
-  secret: process.env.SESSION_SECRET, // Utilisez une chaîne secrète pour signer l'ID de session.
-  resave: false, // Ne pas resauvegarder la session si elle n'a pas été modifiée.
-  saveUninitialized: false, // Ne pas sauvegarder une session qui est nouvelle et non modifiée.
-  cookie: {
-    secure: process.env.IS_HTTPS === 'true' // Convertir en booléen
-  } // `true` si vous êtes en HTTPS, false sinon. ICI C'est false car en dev
-}));
-
-app.use(cookieParser());
-
-// Middleware pour parser le corps des requêtes en texte brut (pour l'XML)
-app.use(bodyParser.text({ type: 'application/xml' }));
-
-/* app.use(bodyParser.urlencoded({ limit: '50mb', extended: true })); */
-
-mongoose
-  .connect(dbURI)
-  .then((result) => app.listen(3000))
-  .catch((err) => console.log(err));
-
-
-app.set("view engine", "ejs");
-
-
-
-
-const requireStudentInPublication = async (req, res, next) => {
-  console.log("REQUIRESTUDENTINPUBLICATION??????")
-  const userId = req.userId; // ID de l'utilisateur extrait du JWT par un autre middleware
-  const publicationId = req.params.publicationId; // Assurez-vous que l'ID de la publication est passé correctement
-
-  try {
-    const publication = await Publication.findById(publicationId);
-    if (!publication) {
-      return res.status(404).send("Publication not found.");
-    }
-
-    if (publication.students.includes(userId)) {
-      next();
-    } else {
-      res.status(403).send("Access denied. You are not listed in this publication.");
-    }
-  } catch (error) {
-    console.error("Error checking student in publication:", error);
-    res.status(500).send("Internal server error");
+// Configuration de Multer pour le stockage des fichiers
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, 'uploads'));
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
   }
-};
+});
 
-
-//app.use(express.static("public"));
-app.use(express.static(path.join(__dirname, 'public')));
-app.use('/wtipiTests', express.static('wtipiTests'));
-
-// Middleware pour authentifier l'accès à wtipiPubs
-app.all('/wtipiPubs/*', function (req, res, next) {
-  //console.log(req.session.loggedIn)
-  //console.log(req.originalUrl)
-  //console.log(req.session.authTest)
-  //console.log(req.session.authTest.length)
-  /* if(req.session.authTest){
- res.redirect("/login");
- return
-  } */
-  // Construction de l'URL attendue
-  const expectedUrl = `/wtipiPubs/test${req.session.authTest}/`;
-  //console.log("BOOOM", req.session.authTest);
-  console.log(req.originalUrl.startsWith(expectedUrl[0]))
-
-  try {
-
-    if (req.session.authTest.length > 0) {
-      console.log("PASSE LE TEST DE LONGUEUR")
-    } else {
-      console.log("ECHEC AU TEST DE LONGUEUR MAIS SANS BUG")
-      res.redirect("/login");
-      return
-    }
-    // Vérification si l'utilisateur est connecté et accède à l'URL attendue
-    if (req.session.loggedIn && req.originalUrl.startsWith(expectedUrl[0])) {
-      next(); // L'utilisateur est autorisé, continue vers la route suivante
-    } else {
-      console.log("REDIRECTION VERS LOGIN")
-      // Sinon, rediriger vers la page de connexion
-      res.redirect("/login");
-    }
-
-
-  } catch (error) {
-    console.log(error)
-
-  }
-
-
-
-
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 50 * 1024 * 1024 } // 50 MB
+});
+const uploadcsv = multer({ 
+  storage: storage,
+  limits: { fileSize: 50 * 1024 * 1024 } // 50 MB
 });
 
 
-app.use('/wtipiPubs', express.static(path.join(__dirname, 'wtipiPubs')));
+
+const dbURI = process.env.DB_URI;
 
 
+app.use(cookieParser());
+app.use(bodyParser.text({ type: 'application/xml' }));
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+
+// Configuration des sessions
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.IS_HTTPS === 'true'
+  }
+}));
+
+app.post('/set_session', (req, res) => {
+  const testCode = req.body.testCode;
+  const studentCode = req.body.studentCode;
+ const publicationCode = req.body.publicationCode;
+  if (!testCode || !studentCode || !publicationCode) {
+    return res.status(400).send('Test code or student code or publication code is missing');
+  }
+
+  req.session.testCode = testCode;
+  req.session.studentCode = studentCode;
+  req.session.publicationCode = publicationCode;
+  res.json({ success: true });
+});
+
+
+
+
+// Connect to MongoDB
+mongoose
+  .connect(dbURI)
+  .then(() => app.listen(3000, () => console.log("**********  Serveur démarré sur http://localhost:3000  ************")))
+  .catch((err) => console.log(err));
+
+// Set view engine
+app.set("view engine", "ejs");
+app.use(express.static(path.join(__dirname, 'public')));
+app.use('/wtipiTests', express.static('wtipiTests'));
+
+
+app.use('/wtipiPubs', express.static('wtipiPubs'));
+// Middleware pour protéger les fichiers statiques
+//app.use('/wtipiPubs/test/:publicationCode/:publicationId*', requireAuthForStaticFiles, express.static(path.join(__dirname, 'wtipiPubs')));
+
+// Application routes with middleware checks
+app.use("/tests", (req, res, next) => {
+  res.locals.currentPage = 'tests';
+  next();
+}, testRoutes);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-
+// Middleware to set the current page
 app.use((req, res, next) => {
-  res.locals.currentPage = 'about'; // Vous pouvez mettre une valeur par défaut ici
+  res.locals.currentPage = 'about';
   next();
 });
 
-
-// Insérer ici la vérification de l'utilisateur pour toutes les routes
 app.use(checkUser);
 
-
-
-app.get("/", (req, res) => {
-  res.redirect("/about");
-});
-
-app.get("/about", (req, res) => {
-  res.render("about", { title: "About", currentPage: 'about' });
-});
-
-//Route API 1 pour obtenir les listes des tests, groupes et publications
-
-app.get('/api/tests', async (req, res) => {
-  try {
-    const tests = await Test.find();
-    res.json(tests);
-  } catch (error) {
-    console.error("Database access error:", error); // This will log the detailed error
-    res.status(500).send("Failed to get tests");
-  }
-});
-
-app.get('/api/groups', async (req, res) => {
-  try {
-    const groups = await Group.find(); // Assuming 'Group' is your Mongoose model for groups
-    res.json(groups);
-  } catch (error) {
-    res.status(500).send("Failed to get groups");
-  }
-});
-
-
-//Route pour télécharger le CSV
+// Route pour télécharger le CSV
 app.post("/uploadcsv", uploadcsv.single("csvfile"), async (req, res) => {
   const activGroup = req.body.activGroup; // ID du groupe actif en MongoDB
   if (!req.file) {
@@ -208,7 +151,13 @@ app.post("/uploadcsv", uploadcsv.single("csvfile"), async (req, res) => {
               role: "student",
               password: user.password,
               group: [activGroup],
-              SID: user.id
+              SID: user.id,
+              school : user.school,
+              town : user.town,
+              sector : user.sector,
+              grade : user.grade,
+              zipcode : user.zipcode,
+              mailStatus : user.mailStatus
             });
             const savedUser = await newUser.save();
             const groupUpdate = await Group.findByIdAndUpdate(activGroup, { $push: { students: savedUser._id } }, { new: true });
@@ -228,132 +177,63 @@ app.post("/uploadcsv", uploadcsv.single("csvfile"), async (req, res) => {
 
 
 
-// Route pour télécharger le fichier ZIP
-app.post('/upload', upload.single('file'), async (req, res) => {
-  if (!req.file) {
-    console.log('Route /upload atteinte');
-    return res.status(400).send('No file uploaded.');
-  } else {
-    const uniCode = req.body.IDcode;
-    const uniq = "test" + uniCode;
-    //console.log(uniCode)
-    try {
-      // Chemin où le fichier ZIP téléchargé est temporairement stocké
-      const tempPath = req.file.path;
-      var testurl;
-      console.log("ZIP TREATMENT");
-      const zip = new AdmZip(tempPath);
-
-      // Extraction du contenu du ZIP en préservant la structure des répertoires
-      zip.extractAllTo(/*target path*/'wtipiTests/' + uniq, /*overwrite*/true);
-
-      try {
-        // Enregistrement du chemin du fichier dans la base de données
-        testurl = 'wtipiTests/' + uniq;
-        const existingTest = await Test.findOne({ uniCode: uniCode });
-        if (existingTest) {
-          await Test.findOneAndUpdate({ uniCode: uniCode }, { testpath: testurl }, { new: true });
-        } else {
-          console.log("Aucun test correspondant trouvé pour ce uniCode");
-          // Gérer l'absence de document ici, peut-être en renvoyant une erreur ou en informant l'utilisateur
-        }
-
-
-        res.send("Fichier uploadé et chemin enregistré !");
-      } catch (error) {
-        console.error("Erreur d'enregistrement dans MongoDB:", error);
-        res.status(500).send("Erreur du serveur.");
-      }
-    } catch (error) {
-      console.log(error);
-      res.status(500).send('Server error.');
-    }
+// Routes API accessibles sans authentification FINI ça ??? Verif
+app.get('/api/tests', async (req, res) => {
+  try {
+    const tests = await Test.find();
+    res.json(tests);
+  } catch (error) {
+    console.error("Database access error:", error);
+    res.status(500).send("Failed to get tests");
   }
 });
 
-//Results treatment *******************************
-
-// Routes
-app.use('/', resultRoutes);
-
-// Middleware pour parser le corps des requêtes en texte brut (pour l'XML)
-/* app.use(bodyParser.text({ type: 'application/xml' }));
-
-const csvWriter = createObjectCsvWriter({
-  path: 'data.csv',
-  append: true,
-  header: [
-    { id: 'timeStamp', title: 'TimeStamp'},
-    { id: 'userID', title: 'User ID' },
-    { id: 'publicationID', title: 'Publication ID' },
-    { id: 'identifier', title: 'IDENTIFIER' },
-    { id: 'value', title: 'VALUE' },
-    { id: 'outcome', title: 'OUTCOME' }
-  ]
+app.get('/api/groups', async (req, res) => {
+  console.log('Route /api/groups atteinte');
+  try {
+    const groups = await Group.find();
+    res.json(groups);
+  } catch (error) {
+    console.error("Database access error:", error);
+    res.status(500).send("Failed to get groups");
+  }
 });
 
-function extractTestIdFromURL(url) {
-  const regex = /\/test(\d+)\//;
-  const match = url.match(regex);
-  if (match && match[1]) {
-    const testCode = match[1];
-    //console.log('Test Code:', testCode); // Affiche "1320231330131313"
-    return testCode;
-  }
-}
+// Page d'accueil
+app.get("/", (req, res) => {
+  res.redirect("/about");
+});
 
-app.post('/process_results', async (req, res) => {
-  //console.log(req)
-  const userId = req.session.userId;
-  const currentTest = extractTestIdFromURL(req.headers.referer);
-  //console.log(currentTest)
-  const currentPublication = await Publication.findOne({testurl: currentTest});
-  //console.log(currentPublication)
-  
+app.get("/about", (req, res) => {
+  res.render("about", { title: "About", currentPage: 'about' });
+});
 
-  xml2js.parseString(req.body, (err, result) => {
-    if (err) {
-      return res.status(500).send('Error parsing XML');
-    }
 
-    // Correction ici pour accéder correctement à itemResult
-    const itemResults = result.assessmentResult.itemResult.map(item => {
-      return {
-        timeStamp : Date.now(),
-        userID: userId,
-        publicationID: currentPublication._id,
-        identifier: item.$.identifier,
-        value: item.responseVariable[0].candidateResponse[0].value[0],
-        outcome: item.outcomeVariable ? item.outcomeVariable[0].value[0] : '0' // Vérifiez si outcomeVariable existe
-      };
-    });
-
-    csvWriter.writeRecords(itemResults)
-      .then(() => {
-        res.send('Data written to CSV successfully');
-      })
-      .catch(error => {
-        res.status(500).send('Failed to write to CSV');
-      });
-  });
-}); */
-
-/* --00-- */
-
-app.use("/tests", (req, res, next) => {
-  res.locals.currentPage = 'tests'; // `res.locals` rend la variable disponible dans toutes les vues
-  next();
-}, testRoutes);
+app.use(assessmentRoutes);
 
 app.use("/assessments", (req, res, next) => {
+  console.log('Middleware /assessments, URL demandée :', req.url);
   res.locals.currentPage = 'assessments';
   next();
 }, assessmentRoutes);
+
+app.use(resultRoutes)
+
 
 app.use("/blogs", (req, res, next) => {
   res.locals.currentPage = 'blogs';
   next();
 }, blogRoutes);
+
+app.use("/parameters", (req, res, next) => {
+  res.locals.currentPage = 'parameters';
+  next();
+}, parameterRoutes);
+
+app.use("/register", (req, res, next) => {
+  res.locals.currentPage = 'register';
+  next();
+}, authRoutes);
 
 app.use("/groups", (req, res, next) => {
   res.locals.currentPage = 'groups';
@@ -367,9 +247,8 @@ app.use("/publications", (req, res, next) => {
 
 app.use(authRoutes);
 
+// 404 handler
 app.use((req, res) => {
   res.status(404).render("404", { title: "404" });
 });
 
-
-console.log("**********  Serveur démarré sur http://localhost:3000  ************");

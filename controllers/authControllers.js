@@ -52,7 +52,8 @@ const loginPost = async (req, res) => {
     req.session.userId = user._id;
     req.session.loggedIn = true;
     req.session.authPub = user.publication;
-    req.session.authTest = user.tests;
+    //req.session.authTest = user.tests;
+    req.session.authTest = user.testAuth || [];
     res.cookie("jwt", token, { httpOnly: true, maxAge: maxAge * 1000 });
     res.status(200).json({ user: user._id, role: user.role, lastname : user.lastname, firstname : user.firstname, groups : user.group });
   } catch (error) {

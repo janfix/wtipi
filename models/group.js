@@ -25,6 +25,18 @@ const groupSchema = new Schema(
     creator: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User'
+    }, 
+    institution: {
+      type: String,
+      required: false,
+    }, 
+    level: {
+      type: String,
+      required: false,
+    }, 
+    sector: {
+      type: String,
+      required: false,
     }
   },
   { timestamps: true }

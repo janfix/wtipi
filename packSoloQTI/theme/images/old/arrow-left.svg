@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="336.59998"
+   height="136.99995"
+   overflow="hidden"
+   version="1.1"
+   id="svg14"
+   sodipodi:docname="Diapositive2.SVG"
+   viewBox="0 0 373.99997 152.22217"
+   inkscape:version="1.3.1 (91b66b0783, 2023-11-16)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview14"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="1.5791667"
+     inkscape:cx="139.31398"
+     inkscape:cy="76.306069"
+     inkscape:window-width="3440"
+     inkscape:window-height="1351"
+     inkscape:window-x="-9"
+     inkscape:window-y="-9"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg14" />
+  <defs
+     id="defs3">
+    <filter
+       id="fx0"
+       x="-0.1"
+       y="-0.1"
+       width="1.2"
+       height="1.2"
+       filterUnits="userSpaceOnUse"
+       primitiveUnits="userSpaceOnUse">
+      <feComponentTransfer
+         color-interpolation-filters="sRGB"
+         id="feComponentTransfer1">
+        <feFuncR
+           type="discrete"
+           tableValues="0 0"
+           id="feFuncR1" />
+        <feFuncG
+           type="discrete"
+           tableValues="0 0"
+           id="feFuncG1" />
+        <feFuncB
+           type="discrete"
+           tableValues="0 0"
+           id="feFuncB1" />
+        <feFuncA
+           type="linear"
+           slope="0.4"
+           intercept="0"
+           id="feFuncA1" />
+      </feComponentTransfer>
+      <feGaussianBlur
+         stdDeviation="1.77778 1.77778"
+         id="feGaussianBlur1" />
+    </filter>
+    <filter
+       id="fx1"
+       x="-0.1"
+       y="-0.1"
+       width="1.2"
+       height="1.2"
+       filterUnits="userSpaceOnUse"
+       primitiveUnits="userSpaceOnUse">
+      <feComponentTransfer
+         color-interpolation-filters="sRGB"
+         id="feComponentTransfer2">
+        <feFuncR
+           type="discrete"
+           tableValues="0 0"
+           id="feFuncR2" />
+        <feFuncG
+           type="discrete"
+           tableValues="0 0"
+           id="feFuncG2" />
+        <feFuncB
+           type="discrete"
+           tableValues="0 0"
+           id="feFuncB2" />
+        <feFuncA
+           type="linear"
+           slope="0.4"
+           intercept="0"
+           id="feFuncA2" />
+      </feComponentTransfer>
+      <feGaussianBlur
+         stdDeviation="1.77778 1.77778"
+         id="feGaussianBlur2" />
+    </filter>
+    <clipPath
+       id="clip2">
+      <path
+         d="m 797.372,330.037 c -3.858,0.075 -7.995,0.236 -12.17,0.236 H 586.131 L 572,339.312 v 50.815 L 745.532,392 C 767.313,377.559 818,351.881 818,338.376 c 0,-8.01 -9.056,-8.563 -20.628,-8.339 z M 1.90735e-5,1.07288e-5 H 1280 V 720 H 1.90735e-5 Z"
+         fill-rule="evenodd"
+         clip-rule="evenodd"
+         id="path2" />
+    </clipPath>
+    <clipPath
+       id="clip3">
+      <path
+         d="m 577,305 c -30.376,0 -55,24.624 -55,55 0,30.376 24.624,55 55,55 30.376,0 55,-24.624 55,-55 0,-30.376 -24.624,-55 -55,-55 z M 1.90735e-5,1.07288e-5 H 1280 V 720 H 1.90735e-5 Z"
+         fill-rule="evenodd"
+         clip-rule="evenodd"
+         id="path3" />
+    </clipPath>
+  </defs>
+  <g
+     clip-path="url(#clip2)"
+     id="g6"
+     transform="translate(-501.00004,-284.00004)">
+    <g
+       filter="url(#fx0)"
+       transform="translate(567,325)"
+       id="g5">
+      <g
+         id="g4">
+        <path
+           d="M 32.7976,0.27319 H 231.869 L 246,9.31239 V 60.1272 L 72.468,62 C 50.6867,47.5589 0,21.881 0,8.37637 0,-2.30481 16.0992,0.27319 32.7976,0.27319 Z"
+           stroke="#ffc000"
+           stroke-width="2"
+           stroke-miterlimit="8"
+           fill="#ffc000"
+           fill-rule="evenodd"
+           transform="matrix(-1,0,0,1,253.828,7.82843)"
+           id="path4" />
+      </g>
+    </g>
+  </g>
+  <path
+     d="M 284.20236,46.27315 H 85.13096 l -14.131,9.0392 v 50.81481 l 173.532,1.8728 c 21.7813,-14.4411 72.468,-40.119 72.468,-53.62363 0,-10.68118 -16.0992,-8.10318 -32.7976,-8.10318 z"
+     stroke="#ffc000"
+     stroke-width="2"
+     stroke-miterlimit="8"
+     fill="#ffc000"
+     fill-rule="evenodd"
+     id="path6" />
+  <g
+     clip-path="url(#clip3)"
+     id="g9"
+     transform="translate(-501.00004,-284.00004)">
+    <g
+       filter="url(#fx1)"
+       transform="translate(512,295)"
+       id="g8">
+      <g
+         id="g7">
+        <path
+           d="m 12.8284,67.8284 c 0,-30.3756 24.6244,-55 55,-55 30.3757,0 54.9996,24.6244 54.9996,55 0,30.3757 -24.6239,54.9996 -54.9996,54.9996 -30.3756,0 -55,-24.6239 -55,-54.9996 z"
+           stroke="#ffc000"
+           stroke-width="12"
+           stroke-miterlimit="8"
+           fill="#ffffff"
+           fill-rule="evenodd"
+           id="path7" />
+      </g>
+    </g>
+  </g>
+  <path
+     d="m 20.99996,75.99996 c 0,-30.376 24.624,-55 55,-55 30.376,0 55,24.624 55,55 0,30.376 -24.624,55 -55,55 -30.376,0 -55,-24.624 -55,-55 z"
+     stroke="#ffc000"
+     stroke-width="12"
+     stroke-miterlimit="8"
+     fill="#ffffff"
+     fill-rule="evenodd"
+     id="path9" />
+  <g
+     id="g13"
+     transform="translate(-501.00004,-284.00004)">
+    <g
+       id="g12">
+      <g
+         id="g11">
+        <path
+           d="m 97.1667,47.4792 -31.5792,-26.5 V 36.4375 C 17.1146,36.8792 8.83333,86.125 8.83333,86.125 c 0,0 17.99787,-26.1688 56.75417,-26.5 v 14.3542 z"
+           fill="#ffc000"
+           transform="matrix(-1.03774,0,0,1,632,307)"
+           id="path10" />
+      </g>
+    </g>
+  </g>
+  <text
+     fill="#fefefe"
+     font-family="Aptos, Aptos_MSFontService, sans-serif"
+     font-weight="700"
+     font-size="37px"
+     id="text10"
+     x="156.1689"
+     y="89.402153">PREV</text>
+</svg>

@@ -19,6 +19,12 @@
             <input type="text" id="groupName" name="groupName" required />
             <label for="description">Group description:</label>
             <input type="text" id="description" name="description" required />
+            <label for="institution">Institution:</label>
+            <input type="text" id="institution" name="institution" required />
+            <label for="sector">Sector:</label>
+            <input type="text" id="sector" name="sector" required />
+            <label for="level">Level:</label>
+            <input type="text" id="level" name="level" required />
             <label for="body">More group info:</label>
             <textarea placeholder="More informations on this group" id="body" name="body" required></textarea>
             <div class="buttNext"> <button class="step-2" type="submit">Next : add students to the group >></button>
@@ -139,7 +145,10 @@
               groupName: form.groupName.value,
               creator: document.getElementById("user-data").getAttribute("data-id"),
               description: form.description.value,
-              body: form.body.value
+              body: form.body.value,
+              institution : form.institution.value,
+              level : form.level.value,
+              sector : form.sector.value
             };
 
             const res = await fetch("/groups", {

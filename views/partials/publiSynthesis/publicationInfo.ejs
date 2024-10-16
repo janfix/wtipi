@@ -1,0 +1,56 @@
+<h2 style="margin-left: 15px;">Publication Info</h2>
+<div class="tabContainer">
+    <% const currentDate=new Date(); const startDate=new Date(publication.startOn); const endDate=new
+        Date(publication.endOn); let status='NOT STARTED' ; let statusColor='grey' ; let statusClass='' ; if
+        (currentDate>= startDate && currentDate <= endDate) { status='PROCESSING' ; statusColor='red' ;
+            statusClass='blink-two' ; } else if (currentDate> endDate) {
+            status = 'FINISHED';
+            statusColor = 'green';
+            }
+            %>
+
+
+            <div class="cardTP">
+                <div class="cardTitle process">creator</div>
+                <div class="cardContent">
+                    <%= publication.creatorName %>
+
+                </div>
+            </div>
+            <div class="cardTP">
+                <div class="cardTitle process">status</div>
+                <div class="cardContent">
+                    <span style="color:<%= statusColor %>;" class="<%= statusClass %>">
+                        <%= status %>
+                    </span>
+
+                </div>
+            </div>
+
+
+            <div class="cardTP">
+                <div class="cardTitle fact2">starting date</div>
+                <div class="cardContent">
+                    <%= new Date(publication.startOn).toLocaleString('fr-FR', { weekday: 'long' , year: 'numeric' ,
+                        month: 'long' , day: 'numeric' , hour: 'numeric' , minute: 'numeric' }) %>
+                </div>
+            </div>
+
+            <div class="cardTP">
+                <div class="cardTitle fact2">ending date</div>
+                <div class="cardContent">
+                    <%= new Date(publication.endOn).toLocaleString('fr-FR', { weekday: 'long' , year: 'numeric' ,
+                        month: 'long' , day: 'numeric' , hour: 'numeric' , minute: 'numeric' }) %>
+                </div>
+            </div>
+            <div class="cardTP">
+                <div class="cardTitle fact2"> session</div>
+                <div class="cardContent"><%= publication.testGroup[0].testSession %></div>
+            </div>
+
+            <div class="comment">
+                <div class="cardTitle fact">message pre-test</div>
+                <div class="cardCommentContent"><%= publication.body %></div>
+            </div>
+
+</div>

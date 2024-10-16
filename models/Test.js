@@ -28,6 +28,36 @@ const testSchema = new Schema(
     }, 
     uniCode : {
       type:String
+    }, 
+    comment:{
+      type: String,
+    },
+    itemNB:{
+      type: String,
+    },
+    answerNB:{
+      type: String,
+    },
+    add_data:{
+      type: Object,
+    },
+    flow:{
+      type: String,
+    },
+    duration:{
+      type: String,
+    },
+    session:{
+      type : String,
+    },
+    grade:{
+      type : String,
+    },
+    type:{
+      type : String,
+    },
+    correction:{
+      type: Object,
     }
 
   },

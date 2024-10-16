@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('./partials/head.ejs') %>
+
+  <body>
+    <%- include('./partials/nav.ejs') %>
+      <div class="content">
+        <h1>Parameters</h1>
+        <p>For the moment, this is not functionnal, but it keeps ideas of the different possible variations and options</p>
+
+        <div class="element">
+          <div class="formEl inputEl">
+            <input disabled="disabled" type="checkbox" hidden="hidden" id="darkMode">
+            <label class="switch" for="darkMode"></label>
+          </div>
+          <div class="formEl labelEl">
+            <p>Dark-mode</p>
+          </div>
+
+        </div>
+
+        <div class="element">
+          <div class="formEl inputEl">
+            <input  type="checkbox" hidden="hidden" id="activDir">
+            <label class="switch" for="activDir"></label>
+          </div>
+          <div class="formEl labelEl">
+            <p>Active directory</p>
+          </div>
+        </div>
+
+
+      </div>
+
+
+      <%- include('./partials/footer.ejs') %>
+  </body>
+
+</html>

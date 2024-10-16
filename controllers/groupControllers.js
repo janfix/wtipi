@@ -25,7 +25,7 @@ const studentList = async  (req, res) => {
 
     // Récupère les étudiants avec la pagination
     const students = await User.find({ '_id': { $in: group.students } })
-                               .select('SID lastname firstname email -_id')
+                               .select('SID lastname firstname email school sector grade town zipcode mailStatus -_id')
                                .skip(skip)
                                .limit(limit);
 
@@ -70,6 +70,7 @@ const groupCreateGet = (req, res) => {
 const groupCreatePost = (req, res) => {
   //console.log(req.body)
   const group = new Group(req.body);
+  console.log(group)
 
   group
     .save()

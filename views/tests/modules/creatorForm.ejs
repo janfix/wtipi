@@ -1,0 +1,62 @@
+<form id="qti22_TAO" action="/tests/installTest"  method="POST">
+    <div id="user-data" data-id="<%= user.id %>" data-email="<%= user.email %>">
+      <p>Your test will be saved based on your ID : <%= user.email %>, so that other users will not be able to delete it.</p>
+      <p>Test Size limit package: 50 Mo</p>
+    </div>
+    <label for="title">Test title: (you can change the test name here)</label>
+    <input type="text" id="title" name="title" required />
+    <label for="snippet">Test snippet:</label>
+    <input type="text" id="snippet" name="snippet" required />
+    <label for="comment">Additional information for the students:</label>
+    <textarea id="comment" name="body" placeholder="These information can be added before the test (index student page) : &#13;&#10Test presentation, Instructions, Scoring rules, Expected Duration:, Getting the results, Legal mentions..."
+    ></textarea> 
+    <input hidden type="text" name="type" id="type" placeholder="Test Type">
+    <label for="answerNB">Expected answers (Precise if different from item number)</label>
+    <input type="text" id="answerNB" name="answerNB"  />
+    <input hidden type="text" id="itemNB" name="itemNB" />
+    <!-- <label for="session">Sessions limits (this limits the number of accessible sessions, empty = no limit)</label>
+    <input type="text" id="session" name="session" /> -->
+    <label for="grade">Grade</label>
+    <input type="text" id="grade" name="grade" />
+    <label for="duration">Estimated Duration (minutes)</label>
+    <input type="text" id="duration" name="duration" />
+    <label for="subject">Subject</label>
+    <select name="subject" id="subject">
+      <option value="mathematics">Mathematics</option>
+      <option value="physics">Physics</option>
+      <option value="biology">Biology</option>
+      <option value="chemistry">Chemistry</option>
+      <option value="earth science">Earth Science</option>
+      <option value="art">Art</option>
+      <option value="modern foreing languages">Modern Foreing Languages</option>
+      <option value="history">History</option>
+      <option value="geography">Geography</option>
+      <option value="design">design</option>
+      <option value="computer science">Computer Science</option>
+      <option value="linguistics">Linguistics</option>
+      <option value="social studies">Social Studies</option>
+      <option value="literature">Literature</option>
+      <option value="economics">Economics</option>
+      <option value="science">Science</option>
+      <option value="other">Other</option>
+    </select>
+    
+    <div id="correctionContainer">
+      
+    </div>
+  
+
+    <label for="add_data">Additional data (paste here a json formated string to personalize your test data)</label>
+    <input title="add key words, difficulty info, language level..." type="text" name="add_data" id="add_data">
+
+
+    <div hidden class="zipfileNameContainer unicodeContainer">
+        <label for="zipFileName">ZipFile name (hidden)</label>
+        <input type="text"  id="zipFileName" name="zipFileName">
+        <input type="text"  id="IDcode" name="uniCode" placeholder="IDcode">
+        <input type="text"  id="creator" name="creator" placeholder="Creator" value="<%= user.id %>">
+    </div>
+
+    <button type="submit">Submit</button>
+  </form>
+

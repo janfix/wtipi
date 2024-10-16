@@ -1,3 +1,11 @@
+<%
+// Fonction pour formater la date
+  function formatDate(date) {
+            const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+            return date.toLocaleDateString('en-US', options);
+          }
+%>
+
 <html lang="en">
 <%- include("../partials/head.ejs") %>
 
@@ -5,40 +13,88 @@
     <%- include("../partials/nav.ejs") %>
 
       <div class="details content">
-        <h1>Test : <%= test.title %> - Details</h1>
+        <h1>Test : <%= test.title %> - Information</h1>
+        <hr>
 
         <div class="content">
           <% if(user){ %>
-            <p>Informations provenant du manifest.json pour les tests provenant de TAO</p>
+            <div class="snippetContainer">
+              <%= test.snippet %>
+            </div>
+            <div class="cardContainer">
+
+              <div class="cardTP">
+                <div class="cardTitle fact">last update</div>
+                <div class="cardContent">
+                  <%= formatDate(test.updatedAt) %>
+                </div>
+              </div>
+
+              <div class="cardTP">
+                <div class="cardTitle fact">test type</div>
+                <div class="cardContent">
+                  <%= test.type %>
+                </div>
+              </div>
+
+              <div class="cardTP">
+                <div class="cardTitle fact">estimated duration</div>
+                <div class="cardContent">
+                  <%= test.duration %>
+                </div>
+              </div>
+
+              <div class="cardTP">
+                <div class="cardTitle fact"> subject</div>
+                <div class="cardContent">
+                  <%= test.subject %>
+                </div>
+              </div>
+              <div class="cardTP">
+                <div class="cardTitle fact">item number</div>
+                <div class="cardContent">
+                  <%= test.itemNB %>
+                </div>
+              </div>
+              <div class="cardTP">
+                <div class="cardTitle fact">answer number</div>
+                <div class="cardContent">
+                  <%= test.answerNB %>
+                </div>
+              </div>
+              <div class="cardTP">
+                <div class="cardTitle fact">grade</div>
+                <div class="cardContent">
+                  <%= test.grade %>
+                </div>
+              </div>
+
+
+
+            </div>
+            <div class="testPreview">
+              <iframe src="../<%= test.testpath %>" width="100%" height="600px" style="border:1px grey solid;"
+                frameborder="1" allowfullscreen></iframe>
+            </div>
+
+
+
+            <div class="previewTest" style="display:none;">HERE IFRAME</div>
             <%}%>
-              <% if(user){ %>
-                <p>Informations provenant du test.xml pour les tests provenant de TAO</p>
-                <%}%>
-                  <% if(user){ %>
-                    <div class="previewTest" style="display:none;">HERE IFRAME</div>
-                    <%}%>
-                      <button onclick="renderIframe(this)" data-testpath="<%= test.testpath %>"
-                        class="previewBT <%= test.id %>">Preview</button>
-                      <% if(user){ %>
-                        <p>Informations provenant du monitoring</p>
-                        <%}%>
-                          <p>
-                            <%= test.body %>
-                          </p>
+
+
         </div>
 
         <!-- Tool Bar -->
         <% if(user){ %>
           <% if(user._id==test.creator){ %>
             <a class="delete actionBT" data-doc="<%= test._id %>">
-              <img src="/img/trashcan.svg" title="Remove Assessment" alt="Delete icon" />
+              <img src="/img/trashcan.svg" title="Remove test" alt="Delete icon" />
             </a>
-            <a class="edit actionBT" data-doc="<%= test._id %>">
-              <img width="25px" src="/img/btEdit.png" title="Edit test information" alt="Edit Test info" />
+            <a class="edit actionBT" href="../tests" data-doc="<%= test._id %>">
+              <img width="25px" src="/img/iconeList.png" title="Edit test information" alt="Edit Test info" />
             </a>
-            <a class="start actionBT" data-doc="<%= test._id %>">
-              <img width="25px" src="/img/btStart.png" title="Start test" alt="Start Test" />
-            </a>
+
             <% }else{%>
               <div class="delete">Impossible</div>
               <%}%> %> <% } %>
@@ -47,30 +103,23 @@
 
       <%- include("../partials/footer.ejs") %>
 
-        <script>
-
-          const trashcan = document.querySelector("a.delete");
-
-          function renderIframe(buttonElement) {
-            const Tpath = buttonElement.getAttribute('data-testpath');
-            const previewContainer = document.querySelector('.previewTest');
-            previewContainer.style.display = 'block';
-            console.log(Tpath)
-            previewContainer.innerHTML = `<iframe src="/${Tpath}/"  width="100%" height="500px"  style="border:1px grey solid;" frameborder="1" allowfullscreen></iframe>`;
-
-
-
-          }
-
-
-          trashcan.addEventListener("click", (e) => {
+      <script>
+        const trashcan = document.querySelector("a.delete");
+      
+        trashcan.addEventListener("click", (e) => {
+          e.preventDefault(); // Prevent the default link behavior
+      
+          const confirmation = confirm("Are you sure you want to delete this item?");
+      
+          if (confirmation) {
             const endpoint = `/tests/${trashcan.dataset.doc}`;
             fetch(endpoint, { method: "DELETE" })
               .then((response) => response.json())
               .then((data) => (window.location.href = data.redirect))
               .catch((err) => console.log(err));
-          });
-        </script>
+          }
+        });
+      </script>
   </body>
 
 </html>

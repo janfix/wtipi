@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="335.59998"
+   height="136.99997"
+   overflow="hidden"
+   version="1.1"
+   id="svg14"
+   sodipodi:docname="Diapositive1.SVG"
+   viewBox="0 0 372.88886 152.22219"
+   inkscape:version="1.3.1 (91b66b0783, 2023-11-16)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview14"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="1.5791667"
+     inkscape:cx="-360.31662"
+     inkscape:cy="99.102902"
+     inkscape:window-width="3440"
+     inkscape:window-height="1351"
+     inkscape:window-x="-9"
+     inkscape:window-y="-9"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg14" />
+  <defs
+     id="defs3">
+    <filter
+       id="fx0"
+       x="-128"
+       y="-72"
+       width="1536"
+       height="864.00006"
+       filterUnits="userSpaceOnUse"
+       primitiveUnits="userSpaceOnUse">
+      <feComponentTransfer
+         color-interpolation-filters="sRGB"
+         id="feComponentTransfer1">
+        <feFuncR
+           type="discrete"
+           tableValues="0 0"
+           id="feFuncR1" />
+        <feFuncG
+           type="discrete"
+           tableValues="0 0"
+           id="feFuncG1" />
+        <feFuncB
+           type="discrete"
+           tableValues="0 0"
+           id="feFuncB1" />
+        <feFuncA
+           type="linear"
+           slope="0.4"
+           intercept="0"
+           id="feFuncA1" />
+      </feComponentTransfer>
+      <feGaussianBlur
+         stdDeviation="1.77778 1.77778"
+         id="feGaussianBlur1" />
+    </filter>
+    <filter
+       id="fx1"
+       x="-128"
+       y="-72"
+       width="1536"
+       height="864.00006"
+       filterUnits="userSpaceOnUse"
+       primitiveUnits="userSpaceOnUse">
+      <feComponentTransfer
+         color-interpolation-filters="sRGB"
+         id="feComponentTransfer2">
+        <feFuncR
+           type="discrete"
+           tableValues="0 0"
+           id="feFuncR2" />
+        <feFuncG
+           type="discrete"
+           tableValues="0 0"
+           id="feFuncG2" />
+        <feFuncB
+           type="discrete"
+           tableValues="0 0"
+           id="feFuncB2" />
+        <feFuncA
+           type="linear"
+           slope="0.4"
+           intercept="0"
+           id="feFuncA2" />
+      </feComponentTransfer>
+      <feGaussianBlur
+         stdDeviation="1.77778 1.77778"
+         id="feGaussianBlur2" />
+    </filter>
+    <clipPath
+       id="clip2">
+      <path
+         d="m 795.372,328.037 c -3.858,0.073 -7.995,0.232 -12.17,0.232 H 584.131 L 570,337.162 v 49.995 L 743.532,389 C 765.313,374.792 816,349.528 816,336.241 c 0,-7.881 -9.056,-8.425 -20.628,-8.204 z M 1.90735e-5,1.07288e-5 H 1280 V 720 H 1.90735e-5 Z"
+         fill-rule="evenodd"
+         clip-rule="evenodd"
+         id="path2" />
+    </clipPath>
+    <clipPath
+       id="clip3">
+      <path
+         d="m 576,303 c -30.376,0 -55,24.624 -55,55 0,30.376 24.624,55 55,55 30.376,0 55,-24.624 55,-55 0,-30.376 -24.624,-55 -55,-55 z M 1.90735e-5,1.07288e-5 H 1280 V 720 H 1.90735e-5 Z"
+         fill-rule="evenodd"
+         clip-rule="evenodd"
+         id="path3" />
+    </clipPath>
+    <image
+       width="93"
+       height="28"
+       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAF0AAAAcCAMAAAA0q0M4AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAABLUExURQAAAACAgABVqhdddBddixRidhJbgBhheRddgBdogBZZhRVggBRchRddgxdihxRigxNggxNihBRfhBRhhBRfgRRfhBNdgRReghRfgnn7eVsAAAAZdFJOUwACAwsLDQ4VFhYXGBkhIk5QUVlZW1tdZGZTFFqdAAAACXBIWXMAAA7DAAAOwwHHb6hkAAABsUlEQVRIS62W7XaDIAyGddZ+rOu0tY7d/5UuJIEkGOF0p+8vouExvgak6w8j6dB3USmOYb4nOnyYfCdDBBnD9CBNA9JTHMN8TzSd07X5BHgnQwSIcfklrRcsPsXLKGOl5StdC/PQ9ZeVI0+AyIRwj8U06Z9z4CGUM+TAk6ZjMW36MZcb5rFauqWTNy36KPWutzsPw4/3DpaO3jTp/WnLXL+9l7B09Majhyd3AfbB9lOGmTvpmZ6LE3TPRIE3Hn29cgdTl5ffEt6ZV8GVn0sTINfQIe/o0ONYSbwhcS+DNhMMHfA3frxfOy7QwhvqNVSDLl9K08X3tKCVN7xOUC16lqaLeJouXnx5F13fySTQe+gv114utyr9Zd/L5abp5Vd9vWfU5ofS9KIj/9Hvy9HO0fScTHLWKuP36Wp7ivJrj8V7+wx7U6HbaZpudjF3j2RvanTzypquZPb33AjJmypde7NH1/+mc34Qe1Ola2926Op/BPuupJM3dbryZoduvZZ0Kr5BF2926FmIU1bi/A1dn45A/WmWuHYWwsOSpNP8Agb31cmujGvnOM7PKbSKDazr/gChi55QL0IwVwAAAABJRU5ErkJggg=="
+       preserveAspectRatio="none"
+       id="img4" />
+    <clipPath
+       id="clip5">
+      <rect
+         x="656"
+         y="341"
+         width="93"
+         height="28"
+         id="rect3" />
+    </clipPath>
+  </defs>
+  <g
+     clip-path="url(#clip2)"
+     id="g6"
+     transform="translate(-500.00004,-282.00004)">
+    <g
+       filter="url(#fx0)"
+       transform="translate(565,323)"
+       id="g5">
+      <g
+         id="g4">
+        <path
+           d="M 32.7976,0.268783 H 231.869 L 246,9.16219 V 59.1574 L 72.468,61 C 50.6867,46.7918 0,21.5281 0,8.24127 0,-2.26764 16.0992,0.268783 32.7976,0.268783 Z"
+           stroke="#8ed973"
+           stroke-width="2"
+           stroke-miterlimit="8"
+           fill="#8ed973"
+           fill-rule="evenodd"
+           transform="matrix(-1,0,0,1,253.828,7.82843)"
+           id="path4" />
+      </g>
+    </g>
+  </g>
+  <g
+     clip-path="url(#clip3)"
+     id="g9"
+     transform="translate(-500.00004,-282.00004)">
+    <g
+       filter="url(#fx1)"
+       transform="translate(511,293)"
+       id="g8">
+      <g
+         id="g7">
+        <path
+           d="m 12.8284,67.8284 c 0,-30.3756 24.6244,-55 55,-55 30.3757,0 54.9996,24.6244 54.9996,55 0,30.3757 -24.6239,54.9996 -54.9996,54.9996 -30.3756,0 -55,-24.6239 -55,-54.9996 z"
+           stroke="#8ed973"
+           stroke-width="12"
+           stroke-miterlimit="8"
+           fill="#ffffff"
+           fill-rule="evenodd"
+           id="path7" />
+      </g>
+    </g>
+  </g>
+  <g
+     clip-path="url(#clip5)"
+     id="g10"
+     transform="translate(-500.00004,-282.00004)">
+    <use
+       width="100%"
+       height="100%"
+       xlink:href="#img4"
+       transform="translate(656,341)"
+       id="use9" />
+  </g>
+  <g
+     id="g14"
+     transform="translate(-500.00004,-282.63329)">
+    <path
+       d="M 783.2024,328.90203 H 584.131 L 570,337.79544 v 49.99521 l 173.532,1.8426 C 765.3133,375.42505 816,350.16135 816,336.87452 c 0,-10.50891 -16.0992,-7.97249 -32.7976,-7.97249 z"
+       stroke="#8ed973"
+       stroke-width="2"
+       stroke-miterlimit="8"
+       fill="#8ed973"
+       fill-rule="evenodd"
+       id="path6" />
+    <path
+       d="m 521,358.63325 c 0,-30.376 24.624,-55 55,-55 30.376,0 55,24.624 55,55 0,30.376 -24.624,55 -55,55 -30.376,0 -55,-24.624 -55,-55 z"
+       stroke="#8ed973"
+       stroke-width="12"
+       stroke-miterlimit="8"
+       fill="#ffffff"
+       fill-rule="evenodd"
+       id="path9" />
+    <text
+       fill="#fefefe"
+       font-family="Aptos, Aptos_MSFontService, sans-serif"
+       font-weight="700"
+       font-size="37px"
+       id="text10"
+       x="655.72101"
+       y="367.63324">NEXT</text>
+    <g
+       id="g13"
+       transform="translate(-3.0606861e-7,0.63324582)">
+      <g
+         id="g12">
+        <g
+           id="g11">
+          <path
+             d="m 619.167,353.479 -31.579,-26.5 v 15.459 c -48.473,0.441 -56.755,49.687 -56.755,49.687 0,0 17.998,-26.169 56.755,-26.5 v 14.354 z"
+             fill="#8ed973"
+             id="path10" />
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

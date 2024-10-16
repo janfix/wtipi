@@ -23,9 +23,9 @@ const assessmentschema = new Schema(
       type: Array,
       required: true
     },
-    students : {
+    students: {
       type: Array,
-      required : true
+      required: true
     },
     status: {
       type: Boolean //available or not
@@ -42,6 +42,9 @@ const assessmentschema = new Schema(
     },
     testurl: {
       type: String
+    },
+    publicationID:{ 
+      type: String 
     }
   },
   { timestamps: true }
