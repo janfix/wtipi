@@ -1,0 +1,29 @@
+@import url('core.css');
+@import url('linear-slideshow.css');
+@import url('nonlinear-continuous.css');
+
+/* Here additionnal CSS for customized presentation */
+
+.qtijs-input-wrap input[type=radio] {
+   /*  display: none; */
+  }
+  
+.selected {
+    background-color: #0964aa;
+    color: white;
+}
+
+.qtijs-input-wrap:hover{
+    background-color: rgb(201, 232, 243);
+  }
+
+  .qtijs-input-wrap.selected:hover{
+    background-color:#0964aa;
+  }
+
+  .selectedButProtected{
+    background-color: #648fb0;
+    color: rgb(241 236 236)
+  }
+
+  

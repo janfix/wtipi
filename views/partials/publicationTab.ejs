@@ -1,0 +1,312 @@
+<style>
+    /* styles.css ou dans une balise <style> dans votre fichier EJS */
+    .tabs {
+        width: 100%;
+    }
+
+    .tab-links {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .tab-links li {
+        display: inline-block;
+        margin-right: 4px;
+    }
+
+    .tab-links a {
+        padding: 9px 15px;
+        display: inline-block;
+        border-radius: 3px 3px 0 0;
+        background: #a2d9ce;
+        font-size: 16px;
+        font-weight: bold;
+        color: #444;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 3px 1px rgba(0, 0, 0, 0.1)
+    }
+
+    .tab-links a:hover {
+        background: #77bfa3;
+        text-decoration: none;
+    }
+
+    li.active a,
+    li.active a:hover {
+        height: 25px;
+        box-shadow: 0 0px 0px 0px gainsboro;
+        background: #fff;
+        color: #4c4c4c;
+        border-left: 1px solid gainsboro;
+        border-top: 1px solid gainsboro;
+        border-right: 1px solid gainsboro;
+    }
+
+    .tab-content {
+        border: 1px gainsboro solid;
+        padding: 15px;
+        border-radius: 3px;
+        box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+        background: #fff;
+    }
+
+    .tab {
+        display: none;
+    }
+
+    .tab.active {
+        display: block;
+    }
+
+    h2 {
+        color: teal;
+        margin-top: 20px;
+        margin-bottom: 0px;
+    }
+
+    blink {
+        animation: blinker 0.6s linear infinite;
+        color: #1c87c9;
+    }
+
+    @keyframes blinker {
+        50% {
+            opacity: 0;
+        }
+    }
+
+    .blink-one {
+        animation: blinker-one 1s linear infinite;
+    }
+
+    @keyframes blinker-one {
+        0% {
+            opacity: 0;
+        }
+    }
+
+    .blink-two {
+        animation: blinker-two 1.4s linear infinite;
+    }
+
+    @keyframes blinker-two {
+        100% {
+            opacity: 0;
+        }
+    }
+</style>
+
+
+<% const now=new Date(); const startOn=new Date(publication.startOn); const endOn=new Date(publication.endOn); const
+    hasStarted=now>= startOn;
+    const hasEnded = now >= endOn;
+
+
+    function formatRemainingTime(endTime) {
+        const now = new Date();
+        const end = new Date(endTime);
+        const remainingTime = end - now;
+
+        if (remainingTime <= 0) {
+            return "Time is up";
+        }
+
+        const seconds = Math.floor((remainingTime / 1000) % 60);
+        const minutes = Math.floor((remainingTime / (1000 * 60)) % 60);
+        const hours = Math.floor((remainingTime / (1000 * 60 * 60)) % 24);
+        const days = Math.floor(remainingTime / (1000 * 60 * 60 * 24));
+
+        return `${days} days, ${hours} hours, ${minutes} minutes, ${seconds} seconds`;
+    }
+
+    %>
+
+    <div class="tabs">
+        <ul class="tab-links">
+            <li class="active"><a href="#tab1">Synthesis</a></li>
+            <li><a href="#tab2">Parameters</a></li>
+            <!--  <li><a href="#tab3">Convocation</a></li></li> -->
+            <li><a href="#tab4">Students</a></li>
+            <li><a href="#tab5">Results</a></li>
+            <!-- <li><a href="#tab6">Test Analysis</a></li> -->
+        </ul>
+
+        <div class="tab-content">
+            <div id="tab1" class="tab active">
+                <%- include('publiSynthesis/synthesis') %>
+            </div>
+            <div id="tab2" class="tab">
+                <p>Publication snippet : <%= publication.snippet %>
+                </p>
+
+                <%- include('publiParameters/timeManager',{startOn: publication.startOn, endOn :publication.endOn } ) %>
+
+                    <h2>Edit Test</h2>
+
+                    <p>Change the test assigned to this publication, or reload the present test to integrate updates</p>
+
+                    <form action="/publications/<%= publication._id %>/update-test" method="POST">
+                        <label for="testId">Select Test:</label>
+                        <select id="testId" name="testId">
+                            <% tests.forEach(test=> { %>
+                                <option value="<%= test._id %>" <%=test._id.equals(publication.testGroup[0].testId)
+                                    ? 'selected' : '' %>><%= test.title %>
+                                </option>
+                                <% }) %>
+                        </select>
+                        <input type="hidden" name="groupID" value="<%= publication.testGroup[0].groupID.toString() %>">
+                        <br>
+                        <button type="submit">Update Test</button>
+                    </form>
+
+
+
+                    <h2>Check test preview</h2>
+                    <%= publication.testurl %>
+
+                        <iframe src="<%= iframeUrl %>" style="width: 100%; height: 100vh;" frameborder="0"></iframe>
+
+                        <!-- <%- include('publiParameters/proctoring')  %>                                        
+                    <%- include('publiParameters/serverPolicy')%>                    
+                    <%- include('publiParameters/report')%>
+                    <%- include('publiParameters/Security')%> -->
+
+
+
+            </div>
+            <div id="tab3" class="tab">
+                Convocation - mail manager
+            </div>
+            <div id="tab4" class="tab">
+
+
+                <% if (hasStarted && !hasEnded) { %>
+                    <div style="color:red" class="blink-two">
+                        Warning : You can't modify anymore the student list : the assessment has started
+                    </div>
+                    <% } %>
+
+                        <% if (hasEnded) { %>
+                            <div style="color:red" class="blink-two">
+                                Warning : You can't modify anymore the student list : the assessment is over
+                            </div>
+                            <% } %>
+
+
+                                <h2>Activ Group: <%= publication.testGroup[0].groupName %>
+                                </h2>
+                                <!-- <p>Chosen group: <%= publication.testGroup[0].groupId %></p> -->
+
+
+                                <% if (!hasStarted || hasEnded) { %>
+                                    <p>Students in Publication (<span class="studentCount">0</span>) <img
+                                            class="addStudent" title="Add new student" src="/img/user-plus.svg" />
+                                    </p>
+                                    <%}%>
+
+                                        <div style="margin-top: 10px;" id="studentsList">
+                                            <table id="studentListPublication">
+                                                <thead>
+                                                    <tr>
+                                                        <th>First Name</th>
+                                                        <th>Last Name</th>
+                                                        <th>Email</th>
+                                                        <th>School</th>
+                                                        <th>Grade</th>
+                                                        <th>SID</th>
+                                                        <th>Mail Status</th>
+                                                        <th>Exclude</th>
+                                                    </tr>
+                                                </thead>
+
+                                                <tbody>
+                                                    <!-- Les étudiants seront ajoutés ici par JavaScript -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                        <div>Total Students: <span class="studentCount"></span></div>
+
+                                        <div id="paginationControls">
+                                            <button id="prevPage">Previous</button>
+                                            <button id="nextPage">Next</button>
+                                        </div>
+            </div>
+
+
+
+            <div id="tab5" class="tab">
+                <% if (hasEnded) { %>
+                    <form id="downloadResultsForm" action="/publications/download/<%= publication._id %>" method="get">
+                        <button class="check" type="submit">Download CSV</button>
+                      </form>
+                    <% } else if (hasStarted && !hasEnded) { %>
+                        <% let TR =formatRemainingTime(endOn) %>
+                        <%- include('publiResults/monitoring',{ timeRemaining : TR, startOn: publication.startOn, endOn
+                            :publication.endOn, pubID :publication._id } ) %>
+                            <% } else { %>
+                                <p> The assessment has not started... see you later...</p>
+                                <% } %>
+
+
+
+
+
+
+
+            </div>
+            <div id="tab6" class="tab">
+                <h2>Data constitution</h2>
+                Not started | Processing | Accomplished
+                <h2>Test Structure</h2>
+                <p>Test navigation type : Linear</p>
+                <p>Revision/resumption possible : false</p>
+                <p>Randomized item order : true </p>
+                <p>Randomized item response</p>
+                <p>Randomized item value</p>
+                <p>
+                <table>
+                    <th>Question code</th>
+                    <th>Interaction Type</th>
+                    <th>Proctoring option</th>
+                    <th>Succes rate %</th>
+                    <th>Item Difficulty</th>
+                    <th>Item Discrimination</th>
+                    <th>Reliability (Alpha)</th>
+                    <th>Average time</th>
+                    <th>Correction type</th>
+                </table>
+                </p>
+
+                <h2>Test analysis</h2>
+                <p>Taux de réussite global</p>
+                <p hidden>Taux de réussite par question</p>
+                <p>Distribution des scores</p>
+                <p>Test normalized : Score Brut | Score Echelloné | percentiles | Déciles et quartiles | Ecart Type</p>
+                <p>Analyse de l'item (Graphs): </p>
+                <p hidden>Difficulté de l'item (% de réponses correcte)</p>
+                <p hidden>Discrimination de l'item (corrélation entre le score de la question et le score total du test)
+                </p>
+                <p hidden>Coefficient de fiabilité : Cronbach's Alpha</p>
+                <p>Analyse des réponses distractrices</p>
+                <p hidden>Temps passé par question</p>
+                <p>Analyse des réponses ouvertes</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            // Convertir les ObjectId en chaînes de caractères pour les comparer
+            const selectedGroupId = "<%= publication.testGroup[0].groupID.toString() %>";
+
+            // Sélectionner l'option correcte dans le select
+            $("#groupId option").each(function () {
+                if ($(this).val() === selectedGroupId) {
+                    $(this).attr("selected", "selected");
+                }
+            });
+
+        });
+    </script>

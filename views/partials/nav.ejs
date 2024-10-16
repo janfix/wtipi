@@ -1,20 +1,37 @@
 <nav>
   <div class="site-title">
-    <a href="/"><h1>WTP<img class="logotipi" src="../tipis.png"/></h1></a>
+    <a href="/"><h1>WTP<img class="logotipi" src="../img/tipis.png"/></h1></a>
     <p>WTest-Platform</p>
   </div>
+
   <ul>
     <% if(user){ %>
-    <li>Welcome, <%= user.email %> - <%= user.role %></li>
-    <li><a href="/">Tests</a></li>
-    <li><a href="/about">About</a></li>
-    <li><a href="/blogs/create">New Test</a></li>
-    <li><a href="/logout">Log out</a></li>
-    <% }else{ %>
-    <li><a href="/">Test</a></li>
-    <li><a href="/about">About</a></li>
+    <div class="welcomeID">
+      Welcome, <%= user.email %> - <%= user.role %> 
+    </div>
+    <% if(user.role === 'administrator') { %>
+      <li><a href="/" class="<%= currentPage === 'About' ? 'active-link' : '' %>"></a></li>
+      <li><a href="/tests" class="<%= currentPage === 'tests' ? 'active-link' : '' %>">Tests</a></li>
+      <li><a href="/groups" class="<%= currentPage === 'groups' ? 'active-link' : '' %>">Groups</a></li>
+      <li><a href="/publications" class="<%= currentPage === 'publications' ? 'active-link' : '' %>">Publications</a></li>
+    <% } %>
+    
+    <!-- Settings menu -->
+    <li class="settings-menu">
+      <img src="../img/settings-icon.png" alt="Settings" class="settings-icon" />
+      <div class="settings-dropdown">
+        <% if(user.role === 'administrator') { %>
+          <a href="/register" class="<%= currentPage === 'register' ? 'active-link' : '' %>">Register</a>
+          <a href="/parameters" class="<%= currentPage === 'parameters' ? 'active-link' : '' %>">Parameters</a>
+        <% } %>
+        <a href="/logout">Log out</a>
+        <a href="/about" class="<%= currentPage === 'about' ? 'active-link' : '' %>">About</a>
+      </div>
+    </li>
+    
+    <% } else { %>
+    <li><a href="/about" class="<%= currentPage === 'about' ? 'active-link' : '' %>">About</a></li>
     <li><a href="/login">Log in</a></li>
-    <li><a href="/register" class="btn">Register</a></li>
     <% } %>
   </ul>
 </nav>

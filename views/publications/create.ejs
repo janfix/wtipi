@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../partials/head.ejs') %>
+
+  <body>
+    <%- include('../partials/nav.ejs') %>
+
+      <div class="create-publication content">
+        <h1 class="centeredTitle">Create a new publication</h1>
+        <form id="publicationForm" enctype="multipart/form-data">
+          <div id="user-data" data-id="<%= user.id %>" data-email="<%= user.email %>" data-userName = "<%= user.firstname %> <%= user.lastname %>">
+            Your publication will be saved based on your ID that associated with your email <%= user.email %>.
+          </div>
+          <label for="title">Publication title:</label>
+          <input type="text" id="title" name="title" required />
+          <label for="snippet">Publication snippet:</label>
+          <input type="text" id="snippet" name="snippet" required />
+          <label for="body">Publication presentation:</label>
+          <textarea id="body" name="body" required></textarea>
+          <label for="testIDs">Pick a test:</label>
+          <select id="testIDs" name="testIDs" required>
+            <option value="">Select a test</option>
+          </select>
+          <label for="groupIDs">Pick a group:</label>
+          <select id="groupIDs" name="groupIDs" required>
+            <option value="">Select a group</option>
+          </select>
+          <label for="startOn">Start on (pick a date):</label>
+          <input type="date" id="startOn" name="startOn" />
+          <label for="endOn">End on (pick a date):</label>
+          <input type="date" id="endOn" name="endOn" />
+          <label for="pubserver">Choose a server:</label>
+          <select name="pubserver" id="pubserver">
+            <option selected="selected" value="<%= defaultServer %>">Default Server</option>
+            <option value="DistantServer1" disabled>Distant server 1</option>
+            <option value="DistantServer2" disabled>Distant server 2</option>
+            <option value="DistantServer3" disabled>Distant server 3</option>
+          </select>
+          <input type="text" id="unicode" name="unicode" />
+          <p style="margin-top: 15px;">Todo: -> Results will be available online - accessible in the student home page/
+            Send mail report</p>
+          <p>Assessment type : Exam mode (proctoring option with webcam), Normal, Live action</p>
+          <p>Additional Software : calculator...</p>
+          <button type="submit">Submit</button>
+        </form>
+      </div>
+
+      <script>
+        const form = document.querySelector("#publicationForm");
+        var testUnicode;
+
+        document.addEventListener("DOMContentLoaded", function () {
+          fetchTests();
+          fetchGroups();
+        });
+
+        function fetchTests() {
+          fetch('/api/tests', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+          })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Network response was not ok');
+              }
+              return response.json();
+            })
+            .then(tests => {
+              const select = document.getElementById('testIDs');
+              tests.forEach(test => {
+                const option = document.createElement('option');
+                option.value = test._id;
+                option.textContent = test.title;
+                option.setAttribute("data-testName", test.title);
+                option.setAttribute("data-testSubject", test.subject);
+                option.setAttribute("data-testComment", test.comment);
+                option.setAttribute("data-testFlow", test.flow);
+                option.setAttribute("data-testItemNB", test.itemNB);
+                option.setAttribute("data-testDuration", test.duration);
+                option.setAttribute("data-testGrade", test.grade);
+                option.setAttribute("data-testSession", test.session);
+                option.setAttribute("data-testCorrection", test.correction);
+                select.appendChild(option);
+                testUnicode = test.uniCode;
+                option.setAttribute("data-testUnicode", test.uniCode);
+              });
+            })
+            .catch(error => console.error('Error fetching tests:', error));
+        }
+
+        function fetchGroups() {
+          fetch('/api/groups', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+          })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Network response was not ok');
+              }
+              return response.json();
+            })
+            .then(groups => {
+              const select = document.getElementById('groupIDs');
+              groups.forEach(group => {
+                const option = document.createElement('option');
+                option.value = group._id;
+                option.textContent = group.groupName;
+                option.setAttribute('data-sid', group.students);
+                option.setAttribute("data-groupName", group.groupName);
+                option.setAttribute("data-institution", group.institution);
+                option.setAttribute("data-sector", group.sector);
+                option.setAttribute("data-level", group.level);
+                option.setAttribute("data-comment", group.body);
+                select.appendChild(option);
+              });
+            })
+            .catch(error => console.error('Error fetching groups:', error));
+        }
+
+        form.addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const formData = new FormData(form);
+          const title = formData.get("title");
+          const snippet = formData.get("snippet");
+          const body = formData.get("body");
+          const testID = formData.get("testIDs");
+          const groupID = formData.get("groupIDs");
+          const startOn = formData.get("startOn");
+          const endOn = formData.get("endOn");
+          const server = formData.get("pubserver");
+          const testurl = formData.get("testIDs");
+
+          const status = true;
+
+          const testSelect = document.getElementById('testIDs');
+          const groupSelect = document.getElementById('groupIDs');
+
+          const selectedTestOption = testSelect.options[testSelect.selectedIndex];
+          const selectedGroupOption = groupSelect.options[groupSelect.selectedIndex];
+
+          const testName = selectedTestOption.getAttribute("data-testName");
+          const testUnicode = selectedTestOption.getAttribute("data-testUnicode");
+          const testSubject = selectedTestOption.getAttribute("data-testSubject");
+          const testComment = selectedTestOption.getAttribute("data-testComment");
+          const testFlow = selectedTestOption.getAttribute("data-testFlow");
+          const testItemNB = selectedTestOption.getAttribute("data-testItemNB");
+          const testDuration = selectedTestOption.getAttribute("data-testDuration");
+          const testGrade = selectedTestOption.getAttribute("data-testGrade");
+          const testSession = selectedTestOption.getAttribute("data-testSession");
+          const testCorrection = selectedTestOption.getAttribute("data-testCorrection");
+
+
+          const groupName = selectedGroupOption.getAttribute("data-groupName");
+          const groupComment = selectedGroupOption.getAttribute("data-comment");
+          const groupInstitution = selectedGroupOption.getAttribute("data-institution");
+          const groupSector = selectedGroupOption.getAttribute("data-sector");
+          const groupLevel = selectedGroupOption.getAttribute("data-level");
+
+          const students = selectedGroupOption.getAttribute('data-sid').split(',');
+
+          const userElement = document.getElementById("user-data");
+          console.log(userElement)
+          const creator = userElement.getAttribute("data-id");
+          const creatorName = userElement.getAttribute("data-userName");
+
+         
+
+          const publicationData = {
+            title,
+            creator,
+            creatorName,
+            snippet,
+            body,
+            testGroup: {
+              testID: testID,
+              testName: testName,
+              testUnicode: testUnicode,
+              testSubject: testSubject,
+              testComment: testComment,
+              testFlow: testFlow,
+              testItemNB: testItemNB,
+              testDuration: testDuration,
+              testGrade: testGrade,
+              testSession: testSession,
+              testCorrection: testCorrection,
+              
+              groupID: groupID,
+              groupName: groupName,
+              groupComment : groupComment,
+              groupInstitution :groupInstitution,
+              groupLevel :groupLevel,
+              groupSector :groupSector   
+            },
+            students,
+            status,
+            startOn,
+            endOn,
+            server,
+            testurl,
+            testUnicode
+          };
+
+          try {
+            const res = await fetch("/publications", {
+              method: "POST",
+              body: JSON.stringify(publicationData),
+              headers: { "Content-Type": "application/json" },
+            });
+            if (res.ok) {
+              location.assign("/publications");
+            } else {
+              throw new Error('Failed to create publication');
+            }
+          } catch (error) {
+            console.log(error);
+          }
+
+          // Copy Tests Files to Publication directory on chosen Server
+          try {
+            const res = await fetch("/publications/create-publication", {
+              method: "POST",
+              body: JSON.stringify(publicationData),
+              headers: { "Content-Type": "application/json" },
+            });
+            if (res.ok) {
+              location.assign("/publications");
+            }
+          } catch (error) {
+            console.log(error);
+          }
+        });
+
+        function generatePublicationUniqueCode() {
+          const array = new Uint8Array(4);
+          window.crypto.getRandomValues(array);
+          return Array.from(array, byte => byte.toString(4).padStart(2, '0')).join('');
+        }
+
+        const PublicationUniqueCode = generatePublicationUniqueCode();
+        document.getElementById("unicode").value = PublicationUniqueCode;
+
+      </script>
+
+      <%- include('../partials/footer.ejs') %>
+  </body>
+
+</html>

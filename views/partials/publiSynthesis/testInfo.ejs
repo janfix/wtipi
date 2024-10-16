@@ -1,0 +1,55 @@
+<div class="tabSection">
+    <h2>Test indicators</h2>
+    <div class="tabContainer">
+
+
+        <div class="cardTP">
+            <div class="cardTitle fact">test name</div>
+            <div class="cardContent">
+                <%= publication.testGroup[0].testName %>
+            </div>
+        </div>
+
+        
+
+        <div class="cardTP">
+            <div class="cardTitle fact">subject</div>
+            <div class="cardContent">
+               <%= publication.testGroup[0].testSubject %>
+            </div>
+        </div>
+
+        <% if (publication.testGroup[0].testFlow !== "undefined") { %>
+        <div class="cardTP">
+            <div class="cardTitle fact">test flow</div>
+            <div class="cardContent">
+                <%= publication.testGroup[0].testFlow %>
+             </div>
+        </div>
+        <% } %>
+
+        <div class="cardTP">
+            <div class="cardTitle fact">items number</div>
+            <div class="cardContent"> <%= publication.testGroup[0].testItemNB %></div>
+        </div>
+
+        <div class="cardTP">
+            <div class="cardTitle fact2">estimated duration</div>
+            <div class="cardContent"> <%= publication.testGroup[0].testDuration %></div>
+        </div>
+
+<!--         <div class="cardTP">
+            <div class="cardTitle fact">level</div>
+            <div class="cardContent"> <%= publication.testGroup[0].testGrade %></div>
+        </div>
+ -->
+
+
+        
+        <!-- <p>Difficulty : Beginner (Beginner | Expected |difficult)</p>
+<p>Difficulty for linguistics skills : [European :A1..C3]</p> 
+<p>Test normalized : Details...</p>
+<p>Results constitution : Data, automatic score, manual scoring, IA scoring </p>-->
+
+    </div>
+</div>

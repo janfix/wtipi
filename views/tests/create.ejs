@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../partials/head.ejs') %>
+
+  <body>
+    <%- include('../partials/nav.ejs') %>
+
+      <div class="create-test content">
+        <h1 class="centeredTitle">Import a new test</h1>
+        <br>
+        <div class="container centeredTitle">
+          <div class="selectorContainer">
+            <p>Upload a test using a ZIP package. Go to <a class="linkies" href="#">the example tests repository</a>.
+            </p>
+            <p>How to create a test ? <a class="linkies" href="#">Go to the WTP Wiki chapter : how to create a test.</a>
+            </p>
+          </div>
+          <br>
+          <div id="drop-zone" class="drop-zone">
+            <p>Drag & drop your Test ZIP Package here, or click to select it</p>
+            <input type="file" id="file-input" accept=".zip" style="display:none;">
+          </div>
+
+          
+
+          <div hidden id="file-info" class="file-info"></div>
+          <div hidden id="metadata-content" class="metadata-content"></div>
+          <div hidden id="test-info-content" class="test-info-content"></div>
+
+          <div style="margin-top: 20px; display:none" id="test-info">
+            <h2>Recovering QTI Data for <span class="testTitle"></span> test </h2>
+            <div class="cardContainer">
+              <div class="cardTP">
+                <div class="cardTitle fact">test title</div>
+                <div class="cardContent">
+                  <span class="testTitle"></span>
+                </div>
+              </div>
+              <div class="cardTP">
+                <div class="cardTitle fact">test type</div>
+                <div class="cardContent">
+                  <span id="QTIVersion"></span>
+                </div>
+              </div>
+              <div class="cardTP">
+                <div class="cardTitle fact">item number</div>
+                <div class="cardContent">
+                  <span class="itemNB"></span>
+                </div>
+              </div>
+              <div class="cardTP">
+                <div class="cardTitle fact">build with</div>
+                <div class="cardContent">
+                  <span id="toolName"></span>
+                </div>
+              </div>
+              <div class="cardTP">
+                <div class="cardTitle fact">late submission</div>
+                <div class="cardContent">
+                  <span id="allowLateSubmission"></span>
+                </div>
+              </div>
+              <div class="cardTP">
+                <div class="cardTitle fact">navigation</div>
+                <div class="cardContent">
+                  <span id="navigationMode"></span>
+                </div>
+              </div>
+              <div class="cardTP">
+                <div class="cardTitle fact">submission</div>
+                <div class="cardContent">
+                  <span id="submissionMode"></span>
+                </div>
+              </div>
+            </div>
+            <br>
+            <h2>Further info:</h2>
+            <%- include('modules/creatorForm.ejs') %>
+
+
+          </div>
+        </div>
+      </div>
+
+
+      <script>
+        $(document).ready(function () {
+          const form = document.getElementById("qti22_TAO");
+          const testError = document.querySelector(".test.error");
+          const dropZone = document.getElementById('drop-zone');
+          const fileInput = document.getElementById('file-input');
+          const fileInfo = document.getElementById('file-info');
+          const metadataContent = document.getElementById('metadata-content');
+          const testInfoContent = document.getElementById('test-info-content');
+
+          // Empêcher les événements par défaut de drag & drop
+          ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false)
+            document.body.addEventListener(eventName, preventDefaults, false)
+          });
+
+          function preventDefaults(e) {
+            e.preventDefault()
+            e.stopPropagation()
+          }
+
+          // Ajout de classes pour styliser le cadre de drop
+          ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.add('highlight'), false)
+          });
+
+          ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.remove('highlight'), false)
+          });
+
+          // Gérer le dépôt de fichiers
+          dropZone.addEventListener('drop', handleDrop, false);
+
+          function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+
+            handleFiles(files);
+          }
+
+          // Gérer la sélection de fichiers via l'input
+          dropZone.addEventListener('click', () => fileInput.click());
+          fileInput.addEventListener('change', () => handleFiles(fileInput.files));
+
+          function handleFiles(files) {
+            const file = files[0];
+            if (file && file.name.endsWith('.zip')) {
+              fileInfo.textContent = `File selected: ${file.name}`;
+              uploadFile(file);
+            } else {
+              fileInfo.textContent = 'Please upload a valid ZIP file.';
+            }
+          }
+
+          async function uploadFile(file) {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+              const response = await fetch('/tests/upload-zip', {
+                method: 'POST',
+                body: formData
+              });
+
+              if (response.ok) {
+                console.log('RESPONSE OK !!!!!')
+                const result = await response.json();
+                console.log(result);
+                fileInfo.textContent = `File uploaded successfully`;
+
+                metadataContent.textContent = JSON.stringify(result.metadata, null, 2);
+                testInfoContent.textContent = JSON.stringify(result.testDetails, null, 2);
+                let ttype = result.testDetails.testType;
+                ttype = ttype.substring(ttype.lastIndexOf('/') + 1);
+
+                console.log("type:", ttype)
+
+                // Mettre à jour les champs avec les détails du test
+                $(".testTitle").text(result.testDetails.title);
+                $("#QTIVersion").text(ttype);
+                $(".itemNB").text(result.testDetails.itemCount);
+                $("#toolName").text(result.testDetails.toolName);
+                $("#allowLateSubmission").text(result.testDetails.allowLateSubmission);
+                $("#navigationMode").text(result.testDetails.navigationMode);
+                $("#submissionMode").text(result.testDetails.submissionMode);
+                $("#drop-zone").hide();
+
+                const scoringRules = JSON.stringify(result.testDetails.score);
+                console.log(scoringRules);
+
+                if (ttype == "HTML") {
+                  $("#correctionContainer").html(`
+                    <label for="correction">Correction rules</label>
+                    <textarea title="Scoring" name="correction" id="correction">${scoringRules}</textarea>
+                  `);
+                }
+
+
+                // Afficher la section test-info
+                const unicode = generateUniqueCode();
+                console.log(result)
+                $("#title").val(result.testDetails.title)
+                $("#test-info").show();
+                $("#zipFileName").val(result.targetPath)
+                $("#IDcode").val(unicode)
+                $("#type").val(ttype)
+                $("#itemNB").val(result.testDetails.itemCount)
+                $("#answerNB").attr("placeholder", "item number = " + result.testDetails.itemCount)
+                $("#add_data").val('{"allowLateSubmission":"' + result.testDetails.allowLateSubmission +
+                  '", "navigationMode":"' + result.testDetails.navigationMode +
+                  '", "submissionMode":"' + result.testDetails.submissionMode +
+                  '", "keywords":"..."}')
+              } else {
+                fileInfo.textContent = 'Upload failed. Please try again.';
+              }
+            } catch (error) {
+              fileInfo.textContent = `Error: ${error.message}`;
+            }
+          }
+        });
+
+        function generateUniqueCode() {
+          const array = new Uint8Array(4);
+          window.crypto.getRandomValues(array);
+          return Array.from(array, byte => byte.toString(4).padStart(2, '0')).join('');
+        }
+
+
+      </script>
+
+      <style>
+        .drop-zone {
+          border: 2px dashed #ccc;
+          border-radius: 10px;
+          padding: 20px;
+          text-align: center;
+          cursor: pointer;
+          transition: background-color 0.2s ease;
+        }
+
+        .drop-zone.highlight {
+          background-color: #e0e0e0;
+        }
+
+        .file-info {
+          margin-top: 10px;
+        }
+
+        .xml-content {
+          margin-top: 20px;
+          white-space: pre-wrap;
+          background-color: #f5f5f5;
+          padding: 10px;
+          border-radius: 5px;
+        }
+      </style>
+
+      <%- include('../partials/footer.ejs') %>
+  </body>
+
+</html>

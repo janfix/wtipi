@@ -1,0 +1,98 @@
+<script>
+    const pubID = "<%= pubID %>";
+    async function showTemporaryResults() {
+        try {
+
+            $("#ResultsIndicator").css("display","flex");
+            const response = await fetch(`/results?pubID=${pubID}`);
+            const data = await response.json();
+
+            const table = document.querySelector('#A_processing table');
+            // Clear any existing rows
+            table.innerHTML = `
+                <tr>
+                    <th hidden>ID</th>
+                    <th>SID</th>
+                    <th>FirstName</th>
+                    <th>LastName</th>
+                    <th>Question</th>
+                    <th>Answer</th>
+                    <th>Score</th>
+                </tr>
+            `;
+
+            // Populate table with data and count rows and unique students
+            let totalRows = 0;
+            const studentIds = new Set();
+
+            data.results.forEach(result => {
+                console.log(result)
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td hidden>${result.userID}</td>
+                    <td>${result.user.SID}</td>
+                    <td>${result.user.firstName}</td>
+                    <td>${result.user.lastName}</td>
+                    <td>${result.identifier}</td>
+                    <td>${result.value}</td>
+                    <td>${result.outcome}</td>
+                    
+                    
+                `;
+                table.appendChild(row);
+                totalRows++;
+                studentIds.add(result.userID);
+            });
+
+            // Ensure elements exist before updating their content
+            const totalRowsElement = document.getElementById('totalRows');
+            const totalStudentsElement = document.getElementById('totalStudents');
+
+            if (totalRowsElement) {
+                totalRowsElement.textContent = `${totalRows}`;
+            } else {
+                console.error('Total Rows element not found');
+            }
+
+            if (totalStudentsElement) {
+                totalStudentsElement.textContent = `${studentIds.size}`;
+            } else {
+                console.error('Total Students element not found');
+            }
+        } catch (error) {
+            console.error('Error fetching temporary results:', error);
+        }
+    }
+</script>
+
+<h2>Monitoring</h2>
+<div id="A_processing">
+    <p>The assessment is running...</p>
+    <br>
+    <!-- <p>The publication code is <%= pubID %></p> -->
+    <p><b>Time remaining</b>: <%= timeRemaining %>
+    </p>
+    <div style="margin-top: 10px; padding:10px; border : 1px gainsboro solid; text-align:center; width:95%">
+        <button class="monitorBT" onclick="showTemporaryResults()">Show temporary results</button>
+    </div>
+
+    <br>
+    <div id="ResultsIndicator">
+
+        <div class="cardTP">
+            <div class="cardTitle fact">Answers</div>
+            <div class="cardContent">
+                <span id="totalRows"></span>
+            </div>
+        </div>
+        <div class="cardTP">
+            <div class="cardTitle fact">Participants</div>
+            <div class="cardContent">
+                <span id="totalStudents"></span>
+            </div>
+        </div>
+    </div>
+    <table>
+
+    </table>
+</div>

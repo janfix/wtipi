@@ -5,8 +5,20 @@ const bcrypt = require("bcrypt");
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
+  firstname : {
+    type: String,
+  },
+  lastname : {
+    type: String,
+  },
   role:{
     type: String
+  },
+  group : {
+    type : Array
+  },
+  SID : {
+    type : String
   },
   email: {
     type: String,
@@ -20,12 +32,47 @@ const userSchema = new Schema({
     required: [true, "Please enter a password."],
     minlength: [6, "Minimun password length is 6 characters."],
   },
+  tests:{
+    type : Array
+  },
+  testAuth: {
+    type: [String], // Liste des tests autorisés
+    default: [],
+  },
+  publication:{
+    type : Array
+  },
+  school : {
+    type : String
+  },
+  class:{
+    type : String
+  },
+  grade : {
+    type : String
+  }, 
+  sector : {
+    type : String
+  }, 
+  town : {
+    type : String
+  }, 
+  zipcode : {
+    type : String
+  }, 
+  mailStatus : {
+    type : String
+  }
+
 });
 
-// fire a function befor DOC saved to DB
+// Middleware pour hasher le mot de passe uniquement s'il est modifié
 userSchema.pre("save", async function (next) {
-  const salt = await bcrypt.genSalt();
-  this.password = await bcrypt.hash(this.password, salt);
+  // Vérifiez si le mot de passe a été modifié
+  if (this.isModified('password')) {
+    const salt = await bcrypt.genSalt();
+    this.password = await bcrypt.hash(this.password, salt);
+  }
   next();
 });
 

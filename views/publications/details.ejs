@@ -1,0 +1,241 @@
+<% const now=new Date(); const startOn=new Date(publication.startOn); const endOn=new Date(publication.endOn); const
+  hasStarted=now>= startOn;
+  const hasEnded = now >= endOn;
+  %>
+  <html lang="en">
+  <%- include("../partials/head.ejs") %>
+
+    <body>
+      <%- include("../partials/nav.ejs") %>
+
+        <h2>Publication : <%= publication.title %>
+        </h2>
+        <br>
+
+        <div class="details content">
+        <%- include("../partials/publicationTab.ejs", { startOn: publication.startOn, endOn: publication.endOn, tests:
+          tests, publication: publication, iframeUrl: iframeUrl, groups:groups }) %>
+
+          <!-- Tool Bar -->
+          <div>
+            <% if(user){ %>
+              <% if(user._id==publication.creator){ %>
+                <a class="edit actionBT" href="../publications" data-doc="<%= publication._id %>">
+                  <img width="25px" src="/img/iconeList.png" title="Return to the Publication list"
+                      alt="Back to Publication list" />
+              </a>
+                <a class="delete actionBT" data-doc="<%= publication._id %>">
+                  <img src="/img/trashcan.svg" title="Remove Assessment" alt="Delete icon" />
+                </a>
+                <% }else{%>
+                  <div class="delete">Impossible</div>
+                  <%}%>
+                    <% } %>
+
+          </div>
+          </div>
+
+          <%- include("../partials/footer.ejs") %>
+
+            <script>
+
+              //TAB SYSTEM
+              $(document).ready(function () {
+                $('.tab-links a').on('click', function (e) {
+                  var currentAttrValue = $(this).attr('href');
+
+                  // Afficher l'onglet actif
+                  $('.tabs ' + currentAttrValue).show().siblings().hide();
+
+                  // Changer l'onglet actif
+                  $(this).parent('li').addClass('active').siblings().removeClass('active');
+
+                  e.preventDefault();
+                });
+              });
+
+              function drawProgressBar(width, progress) {
+                const percentage = progress * 100;
+                const progressMarks = Math.floor(progress * width);
+                const emptyMarks = width - progressMarks;
+                const progressBar = '[' + '🟩'.repeat(progressMarks) + (progressMarks < width ? '>' : '') + ' '.repeat(emptyMarks) + ']';
+
+                return `${progressBar} ${percentage.toFixed(2)}%`;
+              }
+
+              let currentPage = 1; // Initial page
+              const studentsTable = document.querySelector("#studentsList tbody");
+              const studentCountSpan = document.querySelector(".studentCount");
+
+
+              function loadStudents(page) {
+                const endpoint = `/publications/<%= publication._id %>/students?page=${page}`;
+                fetch(endpoint)
+                  .then(response => response.json())
+                  .then(data => {
+                    // Vérifiez si data contient une propriété 'response'
+                    const responseData = data.response ? data.response : data;
+
+                    //console.log(responseData.students);
+                    //console.log('Loaded students:', responseData);
+
+                    studentsTable.innerHTML = ''; // Clear previous rows
+                    studentCountSpan.textContent = responseData.total;
+                    $(".studentCount").html(responseData.total)
+                    responseData.students.forEach(student => {
+                      studentsTable.innerHTML += `
+              <tr>
+                <td>${student.firstname}</td>
+                <td>${student.lastname}</td>
+                <td>${student.email}</td>
+                <td>${student.school}</td>
+                <td>${student.grade}</td>
+                <td>${student.SID}</td>
+                <td>${student.mailStatus}</td>
+               
+                <td style="text-align:center!important;">           
+                       <% if (!hasStarted || hasEnded) { %>
+                        <span class="deleteStudent" data-dbID="${student._id}">ⓧ</span>
+                       <% } else { %>
+                         -
+                       <% } %>
+                  
+                </td>             
+              </tr>`;
+                    });
+
+                    $(".deleteStudent").on("mouseover", function () {
+                      $(this).parent().parent().css("background-color", "pink");
+                    });
+
+                    $(".deleteStudent").on("mouseleave", function () {
+                      $(this).parent().parent().css("background-color", "transparent");
+                    });
+
+
+                    $(".deleteStudent").on("click", function () {
+                      console.log("DELETER ACTIF")
+                      const studentId = $(this).attr("data-dbid");
+                      console.log(studentId)
+                      const IDToDelete = $(".deleteStudent").attr("data-dbID");
+                      if (confirm('Are you sure you want to delete this student?')) {
+                        fetch(`/publications/delete-student/${studentId}`, {
+                          method: 'DELETE',
+                          headers: {
+                            'Content-Type': 'application/json'
+                          }
+                        })
+                          .then(response => response.json())
+                          .then(data => {
+                            if (data.success) {
+                              $(this).parent().parent().remove();
+                              let studCount = $(".studentCount").html()
+                              studCount = studCount - 1;
+                              $(".studentCount").html(studCount)
+
+                            } else {
+                              alert('Error deleting student');
+                            }
+                          })
+                          .catch(error => console.error('Error:', error));
+                      }
+
+                    });
+
+
+
+                  }
+
+                  )
+                  .catch(err => console.error('Error loading students:', err));
+              }
+
+              document.addEventListener("DOMContentLoaded", () => {
+                loadStudents(currentPage); // Load initial page of students
+              });
+
+              document.getElementById('nextPage').addEventListener('click', () => {
+                currentPage++;
+                loadStudents(currentPage);
+              });
+
+              document.getElementById('prevPage').addEventListener('click', () => {
+                if (currentPage > 1) {
+                  currentPage--;
+                  loadStudents(currentPage);
+                }
+              });
+
+
+              const trashcan = document.querySelector("a.delete");
+              trashcan.addEventListener("click", (e) => {
+                const endpoint = `/publications/${trashcan.dataset.doc}`;
+                fetch(endpoint, { method: "DELETE" })
+                  .then((response) => response.json())
+                  .then((data) => (window.location.href = data.redirect))
+                  .catch((err) => console.log(err));
+              });
+
+
+              document.addEventListener('DOMContentLoaded', function () {
+                const addStudentButton = document.querySelector('.addStudent');
+                const saveStudentButton = document.getElementById('saveStudent');
+                const studentCountSpan = document.querySelector('.studentCount');
+                const tbody = document.querySelector('table tbody');
+                let studentCount = 0;
+
+
+                saveStudentButton.addEventListener('click', function () {
+                  const firstName = document.getElementById('firstName').value;
+                  const lastName = document.getElementById('lastName').value;
+                  const email = document.getElementById('email').value;
+                  const school = document.getElementById('school').value;
+                  const grade = document.getElementById('grade').value;
+                  const sid = document.getElementById('sid').value;
+                  const mailStatus = document.getElementById('mailStatus').value;
+
+                  const newRow = document.createElement('tr');
+                  newRow.innerHTML = `
+                <td>${firstName}</td>
+                <td>${lastName}</td>
+                <td>${email}</td>
+                <td>${school}</td>
+                <td>${grade}</td>
+                <td>${sid}</td>
+                <td>${mailStatus}</td>
+                <td><button class="excludeStudent">Exclude</button></td>
+            `;
+                  tbody.appendChild(newRow);
+
+                  studentCount++;
+                  studentCountSpan.textContent = studentCount;
+                  document.getElementById('addStudentForm').style.display = 'none';
+
+                  // Clear form fields
+                  document.getElementById('firstName').value = '';
+                  document.getElementById('lastName').value = '';
+                  document.getElementById('email').value = '';
+                  document.getElementById('school').value = '';
+                  document.getElementById('grade').value = '';
+                  document.getElementById('sid').value = '';
+                  document.getElementById('mailStatus').value = '';
+                });
+
+                tbody.addEventListener('click', function (event) {
+                  if (event.target.classList.contains('excludeStudent')) {
+                    event.target.closest('tr').remove();
+                    studentCount--;
+                    studentCountSpan.textContent = studentCount;
+                  }
+                });
+              });
+            </script>
+            <style>
+              .disabled {
+                filter: blur(5px);
+                pointer-events: none;
+              }
+            </style>
+    </body>
+
+  </html>

@@ -1,0 +1,11 @@
+<h2>Time Manager</h2>
+<p>Display and modify time limits</p>
+<form action="/publications/<%= publication._id %>/update-dates" method="POST">
+  <label for="startOn">Start Date:</label>
+  <input type="datetime-local" id="startOn" name="startOn" value="<%= startOn.toISOString().substring(0, 16) %>">
+  <br>
+  <label for="endOn">End Date:</label>
+  <input type="datetime-local" id="endOn" name="endOn" value="<%= endOn.toISOString().substring(0, 16) %>">
+  <br>
+  <button type="submit">Update Dates</button>
+</form>

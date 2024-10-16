@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../partials/head.ejs') %>
+
+  <body>
+    <%- include('../partials/nav.ejs') %>
+
+
+      <div class="pubready">Your publication is ready</div>
+      <div id="form-wizard" class="content">
+        <div class="form-step active" id="step-1">
+          <!-- Formulaire 1 : Création de groupe -->
+          <h1 class="centeredTitle">1. Create a new group of students</h1>
+          <form id="create-group-form" action="/groups">
+            <div id="user-data" data-id="<%= user.id %>" data-email="<%= user.email %>">
+              Groups are created under your responsabilities <%= user.email %>.
+            </div>
+            <label for="groupName">Group Name:</label>
+            <input type="text" id="groupName" name="groupName" required />
+            <label for="description">Group description:</label>
+            <input type="text" id="description" name="description" required />
+            <label for="institution">Institution:</label>
+            <input type="text" id="institution" name="institution" required />
+            <label for="sector">Sector:</label>
+            <input type="text" id="sector" name="sector" required />
+            <label for="level">Level:</label>
+            <input type="text" id="level" name="level" required />
+            <label for="body">More group info:</label>
+            <textarea placeholder="More informations on this group" id="body" name="body" required></textarea>
+            <div class="buttNext"> <button class="step-2" type="submit">Next : add students to the group >></button>
+            </div>
+
+          </form>
+        </div>
+      </div>
+      <div class="form-step content cache" id="step-2">
+        <h1 class="centeredTitle">2. Add students to the new group : <span id="activeGroupName"></span></h1>
+        <!-- Formulaire 2 : Attribution des étudiants via CSV -->
+        <form id="assign-students-form" action="/uploadcsv" enctype="multipart/form-data">
+          <input type="file" id="csvfile" name="csvfile" required />
+          <input type="text" id="activGroup" name="activGroup" title="secret ID code in MongoDb">
+          <button type="button" onclick="previewFile()">Prévisualiser</button>
+          <button id="submitAssignation" type="submit">SUBMIT</button>
+        </form>
+        <div id="previewArea"></div>
+      </div>
+
+      <script>
+        const form = document.querySelector("form");
+        const groupError = document.querySelector(".group.error");
+        const activeGroupName = ""
+        var data;
+
+        //TREATMENT SECOND STEP
+        $("#assign-students-form").on("submit", async function (e) {
+          e.preventDefault();
+          console.log("ASSIGNATION ")
+          //LOGIC FORMDATA
+          const formData = new FormData(this);
+
+          //LOGIC FILEDATA
+          const fileData = new FormData(); // Création d'un FormData spécifique pour le fichier
+
+          // Ajouter le fichier CSV
+          const file = formData.get('csvfile');
+          if (file) {
+            fileData.append('csvfile', file);
+          } else {
+            console.error("Aucun fichier trouvé dans FormData");
+            return;
+          }
+
+          // Ajouter activGroup
+          const activGroup = $("#activGroup").val();
+          fileData.append('activGroup', activGroup);
+
+          // Envoi du fichier
+          try {
+            const fileResponse = await fetch('/uploadcsv', {
+              method: 'POST',
+              body: fileData,
+            });
+            if (fileResponse.ok) {
+              console.log("Upload du fichier réussi");
+              location.assign("/groups");
+            } else {
+              console.error("Échec de l'upload du fichier");
+            }
+          } catch (error) {
+            console.error("Erreur lors de l'envoi du fichier :", error);
+          }
+
+          // Envoi de la Data
+          /*  try {
+             const res = await fetch("/blogs", {
+               method: "POST",
+               body: JSON.stringify(blogData),
+               headers: { "content-Type": "application/json" },
+             }).then((result) => {
+               if (result) {
+                 location.assign("/");
+               }
+             });
+           } catch (error) {
+             console.log(error);
+           } */
+
+
+        })
+
+
+        function previewFile() {
+          const file = document.getElementById('csvfile').files[0];
+          const reader = new FileReader();
+
+          reader.onload = function (e) {
+            const previewArea = document.getElementById('previewArea');
+            const lines = e.target.result.split('\n').map(line => line.split(','));
+            const table = document.createElement('table');
+
+            lines.forEach((line, index) => {
+              const row = table.insertRow();
+              line.forEach(cellText => {
+                const cell = row.insertCell();
+                cell.textContent = cellText;
+              });
+            });
+
+            previewArea.innerHTML = ''; // Clear previous previews
+            previewArea.appendChild(table);
+          };
+
+          reader.readAsText(file);
+        }
+
+
+        //TREATMENT FIRST STEP
+        $('#create-group-form').on('submit', async function (e) {
+          e.preventDefault();
+          console.log("STEP 1 OK")
+          const formData = new FormData(this);
+
+          try {
+            const groupData = {
+              groupName: form.groupName.value,
+              creator: document.getElementById("user-data").getAttribute("data-id"),
+              description: form.description.value,
+              body: form.body.value,
+              institution : form.institution.value,
+              level : form.level.value,
+              sector : form.sector.value
+            };
+
+            const res = await fetch("/groups", {
+              method: "POST",
+              body: JSON.stringify(groupData),
+              headers: { "Content-Type": "application/json" },
+            });
+
+            data = await res.json();
+            console.log(data)
+
+            if (!res.ok) throw new Error('Échec de l\'envoi des données du groupe');
+            console.log("Données du groupe envoyées avec succès");
+            
+
+          } catch (error) {
+            console.error("Erreur lors de l'envoi :", error);
+          }
+
+          //WIZZARD LOGIC
+          const currentStep = $(this).closest('.form-step');
+
+          currentStep.hide();
+          $("#step-2").show();
+          $('#activGroup').val(data.groupId)
+
+        });
+
+
+        $('#groupName').on('change', function () {
+
+          $("#activeGroupName").html($(this).val());
+          $("#activGroup").val($(this).val());
+        })
+
+
+
+
+
+        function generateUniqueCode() {
+          const array = new Uint8Array(4);
+          window.crypto.getRandomValues(array);
+          return Array.from(array, byte => byte.toString(4).padStart(2, '0')).join('');
+        }
+
+        // Appel de la fonction et affichage du code unique dans la console
+        const uniqueCode = generateUniqueCode();
+        //console.log(uniqueCode);
+
+      </script>
+
+      <%- include('../partials/footer.ejs') %>
+  </body>
+
+</html>
